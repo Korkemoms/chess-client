@@ -1,0 +1,424 @@
+$color1: #F7F6C8;
+$color2: #B8C29D;
+$color3: #66A594;
+$color4: #05274D;
+$color5: #296F7B;
+$color6: #f4511e;
+$color7: #3B8F66;
+$board-edge: #222222;
+$background: white;
+
+.Black-font {
+  color: black;
+}
+
+.White-font {
+  color: white;
+}
+
+.Time-slider-container {
+  width: 100%;
+  margin: 0 2%;
+}
+
+.My-turn-nametag {
+  background-color: #4CAF50;
+  padding: 0 0.1em;
+}
+
+.Not-my-turn-nametag {
+  background-color: $background;
+  padding: 0 0.1em;
+}
+
+@mixin Piece {
+  background-size: 80%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.Piece-w_king {
+  background: url(images/chess_pieces/w_king.png);
+  @include Piece;
+}
+
+.Piece-w_queen {
+  background: url(images/chess_pieces/w_queen.png);
+  @include Piece;
+}
+
+.Piece-w_rook {
+  background: url(images/chess_pieces/w_rook.png);
+  @include Piece;
+}
+
+.Piece-w_bishop {
+  background: url(images/chess_pieces/w_bishop.png);
+  @include Piece;
+}
+
+.Piece-w_knight {
+  background: url(images/chess_pieces/w_knight.png);
+  @include Piece;
+}
+
+.Piece-w_pawn {
+  background: url(images/chess_pieces/w_pawn.png);
+  @include Piece;
+}
+
+.Piece-b_king {
+  background: url(images/chess_pieces/b_king.png);
+  @include Piece;
+}
+
+.Piece-b_queen {
+  background: url(images/chess_pieces/b_queen.png);
+  @include Piece;
+}
+
+.Piece-b_rook {
+  background: url(images/chess_pieces/b_rook.png);
+  @include Piece;
+}
+
+.Piece-b_bishop {
+  background: url(images/chess_pieces/b_bishop.png);
+  @include Piece;
+}
+
+.Piece-b_knight {
+  background: url(images/chess_pieces/b_knight.png);
+  @include Piece;
+}
+
+.Piece-b_pawn {
+  background: url(images/chess_pieces/b_pawn.png);
+  @include Piece;
+}
+
+.Small-wrapper-half {
+  width: 6.25%;
+  max-width: 6.25%;
+
+  display: inline-block;
+  position: relative;
+
+  &:after {
+    padding-top: 100%;
+    /* 1:1 ratio */
+    display: block;
+    content: '';
+  }
+
+  & > * {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+
+    padding: 0;
+    margin: 0;
+
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.Small-wrapper {
+  width: 10%;
+  max-width: 10%;
+  display: inline-block;
+  position: relative;
+
+  font-size: 18px;
+  font-weight: normal;
+
+  &:after {
+    padding-top: 100%;
+    /* 1:1 ratio */
+    display: block;
+    content: '';
+  }
+
+  & > * {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+
+    padding: 0;
+    margin: 0;
+
+    width: 100%;
+    height: 100%;
+
+  }
+
+  & > .Number-label-container {
+    z-index: 10;
+
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 2em;
+    text-align: center;
+    display: inline-block;
+
+    width: 1.3em;
+    height: 1.3em;
+
+    & .Number-label {
+      font-weight: normal;
+      text-align: center;
+      margin: 0;
+      margin-top: -4px;
+      vertical-align: middle;
+    }
+
+  }
+
+  & * {
+    font-weight: normal;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .Small-wrapper {
+      font-size: 14px;
+  }
+}
+
+@media screen and (max-width: 350px) {
+  .Small-wrapper {
+      font-size: 11px;
+  }
+}
+
+.Square {
+
+  background-color: inherit;
+  text-align: right;
+  vertical-align: top;
+
+  border: 0;
+  &:focus {
+    outline: none;
+  }
+}
+
+.Big-wrapper {
+
+  width: 600px;
+  max-width: 100%;
+  display: inline-block;
+  position: relative;
+  margin-top: -10%;
+
+  &:after {
+    padding-top: 100%; // perfect square
+    display: block;
+    content: '';
+  }
+
+  & > * {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+
+    padding: 0;
+    margin: 0;
+
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.Border-left {
+  border-left: 2px solid $board-edge;
+}
+
+.Border-right {
+  border-right: 2px solid $board-edge;
+}
+
+.Border-bot {
+  border-bottom: 2px solid $board-edge;
+}
+
+.Border-top {
+  border-top: 2px solid $board-edge;
+}
+
+.Button {
+
+  background-color: $color5;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  margin: 0;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 24px;
+
+  &-small {
+    @extend .Button;
+    padding: 7px 15px;
+    font-size: 18px;
+  }
+
+  &-medium {
+    @extend .Button;
+    padding: 15px 32px;
+    font-size: 24px;
+  }
+
+  &-large {
+    @extend .Button;
+    padding: 18px 40px;
+    font-size: 36px;
+  }
+
+  &:disabled {
+    background-color: gray;
+    cursor: default;
+  }
+}
+
+.Link {
+
+  background-color: transparent;
+  border: none;
+  color: darkblue;
+  margin: 0;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.Game-container {
+  
+  label {
+      font-weight: normal;
+  }
+
+  font-size: 20px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  font-weight: normal;
+  justify-content: center;
+  flex-direction: column;
+  width: 600px;
+  max-width: 100%;
+  color: black;
+
+  .Black {
+    color: #222;
+  }
+
+  .Player-bar {
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    max-width: 100%;
+    padding: 0 0 0 0;
+    height: 1em;
+
+    &-bottom {
+      @extend .Player-bar;
+      padding: 0;
+      margin-bottom: 1em;
+    }
+
+    &-top {
+      margin-top: 1em;
+    }
+
+    & > .Square {
+      max-height: 30px;
+      max-width: 30px;
+      background-size: contain;
+      margin-bottom: 3px;
+    }
+  }
+
+  .Game-board {
+
+    .Board-row {
+
+      max-height: 10%;
+
+      padding: 0;
+      margin: 0;
+      cursor: default;
+
+      .Color1 {
+        background-color: #fffff0;
+      }
+
+      .Color2 {
+        background-color: darkseagreen;
+      }
+
+      .Last-move {
+        background-color: orange;
+      }
+
+      .Possible-move {
+        background-color: green;
+        cursor: pointer;
+      }
+
+      .Focus-piece {
+        background-color: green;
+        cursor: pointer;
+      }
+
+      .Label {
+
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        text-align: center;
+        border: 0;
+
+        & > * {
+          margin: 0;
+        }
+
+        &-top {
+          color: $background;
+        }
+
+        &-left {
+          color: $background;
+        }
+
+        &-right {
+          color: $board-edge;
+        }
+
+        &-bot {
+
+        }
+      }
+
+      &:after {
+        clear: both;
+        content: "";
+        display: table;
+      }
+
+    }
+  }
+}
