@@ -8,6 +8,9 @@ $color7: #3B8F66;
 $board-edge: #222222;
 $background: white;
 
+$background-color1: #F2ECD5;
+$background-color2: #A5BAA0;
+
 .Black-font {
   color: black;
 }
@@ -238,19 +241,23 @@ $background: white;
 }
 
 .Border-left {
-  border-left: 2px solid $board-edge;
+  border-left: 2px solid gray;
+    border-style:groove;
 }
 
 .Border-right {
-  border-right: 2px solid $board-edge;
+  border-right: 2px solid gray;
+    border-style:groove;
 }
 
 .Border-bot {
-  border-bottom: 2px solid $board-edge;
+  border-bottom: 2px solid gray;
+    border-style:groove;
 }
 
 .Border-top {
-  border-top: 2px solid $board-edge;
+  border-top: 2px solid gray;
+    border-style:groove;
 }
 
 .Button {
@@ -303,7 +310,7 @@ $background: white;
 }
 
 .Game-container {
-  
+
   label {
       font-weight: normal;
   }
@@ -363,25 +370,39 @@ $background: white;
       cursor: default;
 
       .Color1 {
-        background-color: #fffff0;
+        background-color: $background-color1;
+
+        &-last-move {
+          background-color: mix(orange, $background-color1, 50%);
+        }
+
+        &-possible-move {
+          background-color: mix(forestgreen, $background-color1, 50%);
+          cursor: pointer;
+        }
+
+        &-focus-piece {
+          background-color: mix(forestgreen, $background-color1, 50%);
+          cursor: pointer;
+        }
       }
 
       .Color2 {
-        background-color: darkseagreen;
-      }
+        background-color: $background-color2;
 
-      .Last-move {
-        background-color: orange;
-      }
+        &-last-move {
+          background-color: mix(orange, $background-color2, 50%);
+        }
 
-      .Possible-move {
-        background-color: green;
-        cursor: pointer;
-      }
+        &-possible-move {
+          background-color: mix(forestgreen, $background-color2, 50%);
+          cursor: pointer;
+        }
 
-      .Focus-piece {
-        background-color: green;
-        cursor: pointer;
+        &-focus-piece {
+          background-color: mix(forestgreen, $background-color2, 50%);
+          cursor: pointer;
+        }
       }
 
       .Label {

@@ -151,7 +151,7 @@ export default class ChessBoard extends React.Component {
     const opponentText = opponentName + (!actuallyMyTurn
       ? ((opponentName[opponentName.length - 1] === 's' ? '\'' : '\'s') + ' turn') : '')
     const playerText = playerName + (actuallyMyTurn
-      ? ((playerName[playerName.length - 1] === 's' ? '´' : '\'s') + ' turn') : '')
+      ? ((playerName[playerName.length - 1] === 's' ? '\'' : '\'s') + ' turn') : '')
 
     // rotate if black
     const rowIndices = rotate
@@ -268,29 +268,30 @@ export default class ChessBoard extends React.Component {
         let klass = ''
         let disabled = true
 
+        // background color
         if (row % 2 === 0) {
           klass += col % 2 === 0 ? ' Color1' : ' Color2'
         } else {
           klass += col % 2 !== 0 ? ' Color1' : ' Color2'
         }
+        if (gotFocus && chessState.canMove(focusRow, focusCol, row, col)) {
+          klass += '-possible-move'
+          disabled = false
+        } else if (gotFocus && focusRow === row && focusCol === col) {
+          klass += '-focus-piece'
+          disabled = false
+        } else if (lastMove !== null && lastMove.fromRow === row &&
+            lastMove.fromCol === col) {
+          klass += '-last-move'
+        } else if (lastMove !== null && lastMove.toRow === row &&
+            lastMove.toCol === col) {
+          klass += '-last-move'
+        }
 
           // set icon and the css properties shared by all squares
-        klass += ' Square Piece' + cssIcon[unicode]
+        let icon = cssIcon[unicode] !== 'undefined' ? cssIcon[unicode] : ''
+        klass += ' Square Piece' + icon
 
-          // colors indicating the last move and where a selected piece can move
-          // also sets cursor
-        if (lastMove !== null && lastMove.fromRow === row && lastMove.fromCol === col) {
-          klass += ' Last-move'
-        }
-        if (lastMove !== null && lastMove.toRow === row && lastMove.toCol === col) { klass += ' Last-move' }
-        if (gotFocus && chessState.canMove(focusRow, focusCol, row, col)) {
-          klass += ' Possible-move'
-          disabled = false
-        }
-        if (gotFocus && focusRow === row && focusCol === col) {
-          klass += ' Focus-piece'
-          disabled = false
-        }
         if (!gotFocus && piece.color === chessState.whoseTurn) {
           disabled = false
         }
