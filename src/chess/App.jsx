@@ -20,7 +20,8 @@ export default class App extends React.Component {
     const _this = this
     const http = this.props.route.http
     let redirect = !http.loggedIn &&
-      window.location.href.indexOf('/chess/activate-account/') === -1
+      window.location.href.indexOf('/chess/activate-account/') === -1 &&
+        window.location.href.indexOf('/chess/home') === -1
 
     if (redirect) {
       _this.props.router.push('/login')

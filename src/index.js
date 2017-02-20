@@ -1,13 +1,14 @@
 import React from 'react'
 import './index.css'
 import Login from './chess/Pages/Login.jsx'
+import Home from './chess/Pages/Home.jsx'
 import NewAccount from './chess/Pages/NewAccount.jsx'
 import AccountMustBeActivated from './chess/Pages/AccountMustBeActivated.jsx'
 import ActivateAccount from './chess/Pages/ActivateAccount'
 import ErrorMessage from './chess/Pages/ErrorMessage'
 import {render} from 'react-dom'
 
-import {Router, Route, useRouterHistory} from 'react-router'
+import {Router, Route, useRouterHistory, IndexRedirect} from 'react-router'
 import { createHistory } from 'history'
 
 import Http from './Http.js'
@@ -22,10 +23,13 @@ import ChessTable from './chess/Pages/ChessTable'
 const history = useRouterHistory(createHistory)({
   basename: '/chess'
 })
+
 render(
   <Router history={history}>
     <Route path='/' component={App} http={http}>
+      <IndexRedirect to='/home' />
 
+      <Route path='/home' component={Home} http={http} pageTitle='Welcome' />
       <Route path='/login' component={Login} http={http} pageTitle='Log in' />
       <Route path='/error/:errorMessage/:additionalInfo' component={ErrorMessage} http={http} pageTitle='Error!' />
       <Route path='/new-account' component={NewAccount} http={http} pageTitle='New account' />
