@@ -8,19 +8,19 @@
 // const colLabels = 'abcdefgh';
 
 // unicode symbols
-const w_king = '\u2654',
-  w_queen = '\u2655',
-  w_rook = '\u2656',
-  w_bishop = '\u2657',
-  w_knight = '\u2658',
-  w_pawn = '\u2659',
+const w_king = '\u2654'
+const w_queen = '\u2655'
+const w_rook = '\u2656'
+const w_bishop = '\u2657'
+const w_knight = '\u2658'
+const w_pawn = '\u2659'
 
-  b_king = '\u265A',
-  b_queen = '\u265B',
-  b_rook = '\u265C',
-  b_bishop = '\u265D',
-  b_knight = '\u265E',
-  b_pawn = '\u265F'
+const b_king = '\u265A'
+const b_queen = '\u265B'
+const b_rook = '\u265C'
+const b_bishop = '\u265D'
+const b_knight = '\u265E'
+const b_pawn = '\u265F'
 
 class Piece {
   constructor (unicode, color, moves) {
@@ -54,7 +54,7 @@ class Move {
 }
 
 /* White is bottom */
-export default class ChessState {
+export default class ChessRules {
   constructor () {
     this.pieces = []
     this.whoseTurn = 'White'
@@ -107,9 +107,9 @@ export default class ChessState {
   }
 
   copy () {
-    const gameState = new ChessState()
+    const gameState = new ChessRules()
 
-        // copy all positions (squares)
+    // copy all positions (squares)
     const copyPositions = []
     for (let i = 0; i < this.pieces.length; i++) {
       copyPositions.push(this.pieces[i].copy())
@@ -153,7 +153,7 @@ export default class ChessState {
     return this.pieces[col + row * 8]
   }
 
-    // move a piece, returns a new ChessState
+    // move a piece, returns a new ChessRules
     // assumes it is a valid move, see canMove(row,col,targetRow,targetCol)
   move (row, col, targetRow, targetCol) {
     row = Number(row)
@@ -209,7 +209,7 @@ export default class ChessState {
     return newState
   }
 
-    // move a piece, returns a new ChessState
+    // move a piece, returns a new ChessRules
     // does not account for special behavior (en passant and castling)
     // assumes it is a valid move otherwise, see canMove(row,col,targetRow,targetCol)
   basicMove (row, col, targetRow, targetCol) {

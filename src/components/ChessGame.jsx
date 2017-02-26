@@ -1,30 +1,29 @@
 /**
- * Chess implementation without network play.
+ * Stateless chess game.
  *
  * Andreas Modahl
  */
 
-import './Game.scss'
+import '../Chess.scss'
 import ChessBoard from './ChessBoard.jsx'
-import React from 'react'
-import ChessState from './Chess.js'
+import React, { PropTypes } from 'react'
 
 import Slider from 'rc-slider'
 import 'rc-slider/assets/index.css'
 
-import wKingIcon from './images/chess_pieces/w_king.png'
-import wQueenIcon from './images/chess_pieces/w_queen.png'
-import wRookIcon from './images/chess_pieces/w_rook.png'
-import wBishopIcon from './images/chess_pieces/w_bishop.png'
-import wKnightIcon from './images/chess_pieces/w_knight.png'
-import wPawnIcon from './images/chess_pieces/w_pawn.png'
+import wKingIcon from '../images/chess_pieces/w_king.png'
+import wQueenIcon from '../images/chess_pieces/w_queen.png'
+import wRookIcon from '../images/chess_pieces/w_rook.png'
+import wBishopIcon from '../images/chess_pieces/w_bishop.png'
+import wKnightIcon from '../images/chess_pieces/w_knight.png'
+import wPawnIcon from '../images/chess_pieces/w_pawn.png'
 
-import bKingIcon from './images/chess_pieces/b_king.png'
-import bQueenIcon from './images/chess_pieces/b_queen.png'
-import bRookIcon from './images/chess_pieces/b_rook.png'
-import bBishopIcon from './images/chess_pieces/b_bishop.png'
-import bKnightIcon from './images/chess_pieces/b_knight.png'
-import bPawnIcon from './images/chess_pieces/b_pawn.png'
+import bKingIcon from '../images/chess_pieces/b_king.png'
+import bQueenIcon from '../images/chess_pieces/b_queen.png'
+import bRookIcon from '../images/chess_pieces/b_rook.png'
+import bBishopIcon from '../images/chess_pieces/b_bishop.png'
+import bKnightIcon from '../images/chess_pieces/b_knight.png'
+import bPawnIcon from '../images/chess_pieces/b_pawn.png'
 
 import {Button} from 'react-bootstrap'
 
@@ -75,41 +74,7 @@ cssIcon[bPawn] = '-b_pawn'
 /**
  * Chess implementation without network play.
  */
-export default class Game extends React.Component {
-
-  constructor () {
-    super()
-
-    const chessState = new ChessState()
-    chessState.init()
-    const chessStateHistory = []
-    chessStateHistory.push(chessState)
-
-    this.state = {
-      chessStateHistory: chessStateHistory,
-      visualIndex: 0,
-      actualIndex: 0,
-      focusRow: -1,
-      focusCol: -1,
-      allMoves: [],
-      displayConfirmation: false
-    }
-
-    this.shouldUpdate = true
-  }
-
-  /**
-   * Implemented to avoid many unnecessary rendering calls.
-   * @param nextProps
-   * @param nextState
-   * @returns boolean whether component should be re-rendered
-   */
-  shouldComponentUpdate (nextProps, nextState) {
-    const should = this.shouldUpdate
-    this.shouldUpdate = false
-
-    return should
-  }
+class ChessGame extends React.Component {
 
   /**
    * Starts interval calls of the function props.onInterval
@@ -117,7 +82,7 @@ export default class Game extends React.Component {
   componentWillMount () {
     const _this = this
 
-    _this.props.onInterval(_this)
+    // _this.props.onInterval(_this)
     this.timerId = window.setInterval(function () {
       if (typeof (_this.props.onInterval) !== 'undefined') {
         _this.props.onInterval(_this)
@@ -129,15 +94,12 @@ export default class Game extends React.Component {
     // when dragging slider
     _this.timerId2 = window.setInterval(function () {
       let update = typeof (_this.timeSliderValue) !== 'undefined'
-      update &= _this.timeSliderValue !== _this.state.visualIndex
+      update &= _this.timeSliderValue !== _this.props.visualIndex
       update &= _this.timeSliderValueConsumed === false
 
       if (update) {
-        _this.shouldUpdate = true
         _this.timeSliderValueConsumed = true
-        _this.setState({
-          visualIndex: _this.timeSliderValue
-        })
+        _this.props.setVisualIndex(_this.timeSliderValue)
       }
     }, 100)
   }
@@ -151,63 +113,44 @@ export default class Game extends React.Component {
   }
 
   handleClick (row, col) {
-    if (this.state === null) return
     // gather some info
 
-    const visualIndex = this.state.visualIndex
-    const chessState = this.state.chessStateHistory[visualIndex]
-    const focusRow = this.state.focusRow
-    const focusCol = this.state.focusCol
+    const visualIndex = this.props.visualIndex
+    const chessState = this.props.chessStateHistory[visualIndex]
+    const focusRow = this.props.focusRow
+    const focusCol = this.props.focusCol
     const gotFocus = focusRow !== -1 && focusCol !== -1
     const haveOpponent = this.props.opponentName !== null
-    const future = this.state.visualIndex >= this.state.actualIndex
+    const future = this.props.visualIndex >= this.props.actualIndex
 
     // determine what to do
     const focusPiece = gotFocus ? chessState.getPiece(focusRow, focusCol) : null
     const clickedPiece = chessState.getPiece(row, col)
     const focusColor = focusPiece !== null ? focusPiece.color : ''
 
-    let setFocus = !clickedPiece.isEmpty()
-      && !gotFocus
-      && clickedPiece.color === chessState.whoseTurn
-      && future
-    let unFocus = gotFocus
-      && focusRow === row
-      && focusCol === col
-      && future
-    let move = focusColor === chessState.whoseTurn
-      && gotFocus
-      && chessState.canMove(focusRow, focusCol, row, col)
-      && haveOpponent
-      && future
+    let setFocus = !clickedPiece.isEmpty() && !gotFocus &&
+    clickedPiece.color === chessState.whoseTurn && future
+    let unFocus = gotFocus && focusRow === row &&
+      focusCol === col && future
+    let move = focusColor === chessState.whoseTurn && gotFocus &&
+      chessState.canMove(focusRow, focusCol, row, col) && haveOpponent && future
 
     // do it
     if (setFocus) { // lift up the piece
-      const newHistory = this.state.chessStateHistory.slice()
+      const newHistory = this.props.chessStateHistory.slice()
 
-      this.setState({
-        chessStateHistory: newHistory,
-        visualIndex: visualIndex,
-        focusRow: row,
-        focusCol: col
-      })
-      this.shouldUpdate = true
+      this.props.setChessStateHistory(newHistory)
+      this.props.setFocus(row, col)
     } else if (unFocus) { // put the piece back
-      const newHistory = this.state.chessStateHistory.slice()
+      const newHistory = this.props.chessStateHistory.slice()
 
-      this.setState({
-        chessStateHistory: newHistory,
-        visualIndex: visualIndex,
-        focusRow: -1,
-        focusCol: -1
-      })
-      this.shouldUpdate = true
+      this.props.setChessStateHistory(newHistory)
+      this.props.setFocus(-1, -1)
     } else if (move) { // move the piece
-      let lastMoveNumber = chessState.moves.length > 0 ?
-        chessState.moves[chessState.moves.length - 1].number : 0
+      let lastMoveNumber = chessState.moves.length > 0
+      ? chessState.moves[chessState.moves.length - 1].number : 0
 
       this.move(focusRow, focusCol, row, col, lastMoveNumber + 1, false)
-      this.shouldUpdate = true
     }
   }
 
@@ -224,8 +167,8 @@ export default class Game extends React.Component {
   move (fromRow, fromCol, toRow, toCol, number, actual) {
     number = Number(number)
 
-    const index = actual ? this.state.actualIndex : this.state.visualIndex
-    const chessState = this.state.chessStateHistory[index]
+    const index = actual ? this.props.actualIndex : this.props.visualIndex
+    const chessState = this.props.chessStateHistory[index]
 
     let lastMoveNumber = chessState.moves.length > 0 ? chessState.moves[chessState.moves.length - 1].number : 0
 
@@ -236,18 +179,16 @@ export default class Game extends React.Component {
 
     const newState = chessState.move(fromRow, fromCol, toRow, toCol)
 
-    const newHistory = this.state.chessStateHistory.slice(0, index + 1)
+    const newHistory = this.props.chessStateHistory.slice(0, index + 1)
     newHistory.push(newState)
 
-    this.setState({
-      chessStateHistory: newHistory,
-      visualIndex: index + 1,
-      actualIndex: this.state.actualIndex + (actual ? 1 : 0),
-      focusRow: -1,
-      focusCol: -1
-    })
+    this.props.setChessStateHistory(newHistory)
+    this.props.setVisualIndex(index + 1)
+    if (actual) {
+      this.props.setActualIndex(this.props.actualIndex + 1)
+    }
 
-    this.shouldUpdate = true
+    this.props.setFocus(-1, -1)
 
     return newState
   }
@@ -260,9 +201,9 @@ export default class Game extends React.Component {
   moveMany (moves, actual) {
     if (moves.length === 0) return
 
-    let index = actual ? this.state.actualIndex : this.state.visualIndex
-    let chessState = this.state.chessStateHistory[index]
-    const newHistory = this.state.chessStateHistory.slice()
+    let index = actual ? this.props.actualIndex : this.props.visualIndex
+    let chessState = this.props.chessStateHistory[index]
+    const newHistory = this.props.chessStateHistory.slice()
 
     let lastMoveNumber = chessState.moves.length > 0 ? chessState.moves[chessState.moves.length - 1].number : 0
 
@@ -278,67 +219,51 @@ export default class Game extends React.Component {
       }
     })
 
-    this.setState({
-      chessStateHistory: newHistory,
-      visualIndex: index,
-      actualIndex: actual ? index : this.state.actualIndex,
-      focusRow: -1,
-      focusCol: -1
-    })
-
-    this.shouldUpdate = true
+    this.props.setChessStateHistory(newHistory)
+    this.props.setVisualIndex(index)
+    if (actual) {
+      this.props.setActualIndex(index)
+    }
+    this.props.setFocus(-1, -1)
 
     return chessState
   }
 
   forward () {
-    if (this.state.visualIndex >= this.state.chessStateHistory.length) return // its already max
-    this.shouldUpdate = true
+    if (this.props.visualIndex >= this.props.chessStateHistory.length) return // its already max
 
-    this.setState({
-      visualIndex: this.state.visualIndex + 1
-    })
+    this.props.setVisualIndex(this.props.visualIndex + 1)
   }
 
   now () {
-    if (this.state.visualIndex === this.state.actualIndex) return // its already now
-    this.shouldUpdate = true
+    if (this.props.visualIndex === this.props.actualIndex) return // its already now
 
-    this.setState({
-      visualIndex: this.state.actualIndex
-    })
+    this.props.setVisualIndex(this.props.actualIndex)
   }
 
   backward () {
-    if (this.state.visualIndex <= 0) return // its already min
-    this.shouldUpdate = true
+    if (this.props.visualIndex <= 0) return // its already min
 
-    this.setState({
-      visualIndex: this.state.visualIndex - 1
-    })
+    this.props.setVisualIndex(this.props.visualIndex - 1)
   }
 
   actuallyMove (confirmed) {
     if (confirmed) {
-      const chessStateHistory = this.state.chessStateHistory
-      const chessState = chessStateHistory[this.state.actualIndex + 1]
+      const chessStateHistory = this.props.chessStateHistory
+      const chessState = chessStateHistory[this.props.actualIndex + 1]
       const lastMove = chessState.moves[chessState.moves.length - 1].copy()
 
       if (typeof (this.props.onMove) !== 'undefined') {
         this.props.onMove(this, lastMove, this.props.playerName)
       }
 
-      this.shouldUpdate = true
+      let visualIndex = this.props.actualIndex + 1
 
-      let visualIndex = this.state.actualIndex + 1
-      this.setState({
-        visualIndex: visualIndex,
-        displayConfirmation: false,
-        actualIndex: visualIndex
-      })
+      this.props.setDisplayConfirmation(false)
+      this.props.setActualIndex(visualIndex)
+      this.props.setVisualIndex(visualIndex)
     } else {
-      this.shouldUpdate = true
-      this.setState({displayConfirmation: true})
+      this.props.setDisplayConfirmation(true)
     }
   }
 
@@ -350,39 +275,34 @@ export default class Game extends React.Component {
   render () {
     console.log('Rendering ChessGame')
 
-    if (this.state === null) {
-      return <div><label>{'No state!'}</label></div>
-    }
-
     // gather some info
 
     // const playerName = this.props.playerName
     // const opponentName = this.props.opponentName
-    const chessStateHistory = this.state.chessStateHistory
-    const visualIndex = this.state.visualIndex
+    const chessStateHistory = this.props.chessStateHistory
+    const visualIndex = this.props.visualIndex
     // const chessState = chessStateHistory[visualIndex]
-    // const focusRow = this.state.focusRow
-    // const focusCol = this.state.focusCol
+    // const focusRow = this.props.focusRow
+    // const focusCol = this.props.focusCol
     // const gotFocus = focusRow !== -1 && focusCol !== -1
     const imWhite = this.props.myColor === 'White'
     // const rotate = !imWhite
     // const lastMove = chessState.moves.length > 0
     //   ? chessState.moves[chessState.moves.length - 1] : null
 
-    const actualIndex = this.state.actualIndex
+    const actualIndex = this.props.actualIndex
     const actuallyMyTurn = (imWhite && actualIndex % 2 === 0) ||
     (!imWhite && actualIndex % 2 !== 0)
 
     return (
       <div className='Game-container'>
         <ChessBoard
-          chessStateHistory={this.state.chessStateHistory}
-          visualIndex={this.state.visualIndex}
-          actualIndex={this.state.actualIndex}
-          focusRow={this.state.focusRow}
-          focusCol={this.state.focusCol}
-          allMoves={this.state.allMoves}
-          displayConfirmation={this.state.displayConfirmation}
+          chessStateHistory={this.props.chessStateHistory}
+          visualIndex={this.props.visualIndex}
+          actualIndex={this.props.actualIndex}
+          focusRow={this.props.focusRow}
+          focusCol={this.props.focusCol}
+          displayConfirmation={this.props.displayConfirmation}
           opponentName={this.props.opponentName}
           playerName={this.props.playerName}
           onClick={(row, col) => this.handleClick(row, col)}
@@ -390,8 +310,8 @@ export default class Game extends React.Component {
 
         <div className={'Player-bar-bottom'}>
           {
-            !this.state.displayConfirmation
-            ? <Button disabled={this.state.visualIndex <= 0}
+            !this.props.displayConfirmation
+            ? <Button disabled={this.props.visualIndex <= 0}
               style={{margin: '0 0.2em'}}
               bsStyle='primary'
               onClick={() => this.backward()}>{'<'}
@@ -399,8 +319,8 @@ export default class Game extends React.Component {
               : ''
           }
           {
-            !this.state.displayConfirmation
-            ? <Button disabled={this.state.visualIndex >= this.state.chessStateHistory.length - 1}
+            !this.props.displayConfirmation
+            ? <Button disabled={this.props.visualIndex >= this.props.chessStateHistory.length - 1}
               style={{margin: '0 0.2em'}}
               bsStyle='primary'
               onClick={() => this.forward()}>{'>'}
@@ -409,7 +329,7 @@ export default class Game extends React.Component {
           }
 
           {
-            !this.state.displayConfirmation
+            !this.props.displayConfirmation
             ? <Button disabled={!actuallyMyTurn || visualIndex !== actualIndex + 1}
               style={{margin: '0.4em 0.2em'}}
               bsStyle='primary'
@@ -418,7 +338,7 @@ export default class Game extends React.Component {
               : ''
           }
           {
-            !this.state.displayConfirmation
+            !this.props.displayConfirmation
             ? <Button style={{margin: '0 0.2em'}}
               bsStyle='primary'
               onClick={() => this.now()}>Current
@@ -426,7 +346,7 @@ export default class Game extends React.Component {
               : ''
           }
           {
-            this.state.displayConfirmation
+            this.props.displayConfirmation
             ? <Button style={{margin: '0.4em 0.2em'}}
               bsStyle='warning'
               onClick={() => this.actuallyMove(true)}>I'm sure
@@ -434,12 +354,11 @@ export default class Game extends React.Component {
               : ''
           }
           {
-            this.state.displayConfirmation
+            this.props.displayConfirmation
             ? <Button style={{margin: '0.4em 0.2em'}}
               bsStyle='primary'
               onClick={() => {
-                this.shouldUpdate = true
-                this.setState({displayConfirmation: false})
+                this.props.setDisplayConfirmation(false)
               }}>Cancel
               </Button>
               : ''
@@ -451,14 +370,23 @@ export default class Game extends React.Component {
               min={0}
               max={Math.max(chessStateHistory.length - 1, 0)}
               step={1}
-              defaultValue={this.state.visualIndex}
-              value={this.state.visualIndex}
+              defaultValue={this.props.visualIndex}
+              value={this.props.visualIndex}
               onChange={(value) => this.sliderMoved(value)}
             />
           </div>
         </div>
-
       </div>
     )
   }
 }
+
+ChessGame.propTypes = {
+  focusRow: PropTypes.number.isRequired,
+  focusCol: PropTypes.number.isRequired,
+  visualIndex: PropTypes.number.isRequired,
+  displayConfirmation: PropTypes.bool.isRequired
+
+}
+
+export default ChessGame

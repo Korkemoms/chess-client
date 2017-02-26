@@ -11,6 +11,14 @@ $background: white;
 $background-color1: #F2ECD5;
 $background-color2: #A5BAA0;
 
+.Small-wrapper > button {
+  cursor: pointer;
+}
+
+.Small-wrapper > button:disabled {
+  cursor: default;
+}
+
 .Black-font {
   color: black;
 }

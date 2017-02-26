@@ -1,27 +1,27 @@
 /**
- * Chess implementation without network play.
+ * Stateless chess board.
  *
  * Andreas Modahl
  */
 
-import './Game.scss'
+import '../Chess.scss'
 import React from 'react'
 
 import 'rc-slider/assets/index.css'
 
-import wKingIcon from './images/chess_pieces/w_king.png'
-import wQueenIcon from './images/chess_pieces/w_queen.png'
-import wRookIcon from './images/chess_pieces/w_rook.png'
-import wBishopIcon from './images/chess_pieces/w_bishop.png'
-import wKnightIcon from './images/chess_pieces/w_knight.png'
-import wPawnIcon from './images/chess_pieces/w_pawn.png'
+import wKingIcon from '../images/chess_pieces/w_king.png'
+import wQueenIcon from '../images/chess_pieces/w_queen.png'
+import wRookIcon from '../images/chess_pieces/w_rook.png'
+import wBishopIcon from '../images/chess_pieces/w_bishop.png'
+import wKnightIcon from '../images/chess_pieces/w_knight.png'
+import wPawnIcon from '../images/chess_pieces/w_pawn.png'
 
-import bKingIcon from './images/chess_pieces/b_king.png'
-import bQueenIcon from './images/chess_pieces/b_queen.png'
-import bRookIcon from './images/chess_pieces/b_rook.png'
-import bBishopIcon from './images/chess_pieces/b_bishop.png'
-import bKnightIcon from './images/chess_pieces/b_knight.png'
-import bPawnIcon from './images/chess_pieces/b_pawn.png'
+import bKingIcon from '../images/chess_pieces/b_king.png'
+import bQueenIcon from '../images/chess_pieces/b_queen.png'
+import bRookIcon from '../images/chess_pieces/b_rook.png'
+import bBishopIcon from '../images/chess_pieces/b_bishop.png'
+import bKnightIcon from '../images/chess_pieces/b_knight.png'
+import bPawnIcon from '../images/chess_pieces/b_pawn.png'
 
 const wKing = '\u2654'
 const wQueen = '\u2655'
@@ -71,33 +71,37 @@ cssIcon[bPawn] = '-b_pawn'
  * The squares of the board
  */
 class Square extends React.Component {
-  render () {
-    let klass = 'Small-wrapper'
-    if (this.props.half === true) {
-      klass += '-half'
-    }
 
-    let disabled = false
-    if (this.props.disabled !== 'undefined') {
-      disabled = this.props.disabled
-    }
+  shouldComponentUpdate (nextProps, nextState) {
+    return nextProps.number !== this.props.number ||
+      nextProps.klass !== this.props.klass ||
+      nextProps.disabled !== this.props.disabled
+  }
+
+  render () {
+    console.log('      Render Square')
 
     return (
-      <div className={klass}>
-        { typeof (this.props.number) !== 'undefined' && this.props.number !== 1
-        ? <div className='Number-label-container'><label className='Number-label'>{this.props.number}</label></div> : ''}
+      <div className='Small-wrapper'>
+        { this.props.number === 1 ? ''
+          : <div className='Number-label-container'>
+            <label className='Number-label'>{this.props.number}</label>
+          </div> }
 
         <button
-          disabled={disabled}
+          disabled={this.props.disabled}
           className={this.props.klass}
-          onClick={() => {
-            if (typeof (this.props.onClick) !== 'undefined') {
-              this.props.onClick()
-            }
-          }} />
+          onClick={() => this.props.onClick()} />
       </div>
     )
   }
+}
+
+Square.defaultProps = {
+  disabled: false,
+  onClick: () => {},
+  number: 1,
+  klass: ''
 }
 
 /**
@@ -122,15 +126,10 @@ class Label extends React.Component {
  */
 export default class ChessBoard extends React.Component {
 
-  constructor () {
-    super()
-
+  render () {
+    console.log('  Rendering ChessBoard')
     this.rowLabels = '87654321'
     this.colLabels = 'abcdefgh'
-  }
-
-  render () {
-    console.log('Rendering ChessBoard')
 
     // gather some info
     const playerName = this.props.playerName
@@ -194,7 +193,6 @@ export default class ChessBoard extends React.Component {
         unicode: unicode
       })
     })
-
     // prepare board
 
     let rows = []
