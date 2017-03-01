@@ -17,31 +17,26 @@ const initialState = {
 const update = (state = initialState, action) => {
   switch (action.type) {
     case 'SET_FOCUS':
-      return {
-        ...state,
+      return Object.assign({}, state, {
         focusRow: action.focusRow,
         focusCol: action.focusCol
-      }
+      })
     case 'SET_VISUAL_INDEX' :
-      return {
-        ...state,
+      return Object.assign({}, state, {
         visualIndex: action.visualIndex
-      }
+      })
     case 'SET_ACTUAL_INDEX' :
-      return {
-        ...state,
+      return Object.assign({}, state, {
         actualIndex: action.actualIndex
-      }
+      })
     case 'SET_DISPLAY_CONFIRMATION' :
-      return {
-        ...state,
+      return Object.assign({}, state, {
         displayConfirmation: action.displayConfirmation
-      }
+      })
     case 'SET_CHESS_STATE_HISTORY' :
-      return {
-        ...state,
+      return Object.assign({}, state, {
         chessStateHistory: action.chessStateHistory
-      }
+      })
     default:
       return state
   }

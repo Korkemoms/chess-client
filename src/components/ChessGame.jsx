@@ -385,7 +385,10 @@ ChessGame.propTypes = {
   focusRow: PropTypes.number.isRequired,
   focusCol: PropTypes.number.isRequired,
   visualIndex: PropTypes.number.isRequired,
-  displayConfirmation: PropTypes.bool.isRequired
+  actualIndex: PropTypes.number.isRequired,
+  displayConfirmation: PropTypes.bool.isRequired,
+  opponentName: PropTypes.string.isRequired,
+  playerName: PropTypes.string.isRequired
 
 }
 
