@@ -7,8 +7,6 @@
 import '../Chess.scss'
 import React from 'react'
 
-import 'rc-slider/assets/index.css'
-
 import wKingIcon from '../images/chess_pieces/w_king.png'
 import wQueenIcon from '../images/chess_pieces/w_queen.png'
 import wRookIcon from '../images/chess_pieces/w_rook.png'
@@ -79,8 +77,6 @@ class Square extends React.Component {
   }
 
   render () {
-    console.log('      Render Square')
-
     return (
       <div className='Small-wrapper'>
         { this.props.number === 1 ? ''
@@ -127,7 +123,6 @@ class Label extends React.Component {
 export default class ChessBoard extends React.Component {
 
   render () {
-    console.log('  Rendering ChessBoard')
     this.rowLabels = '87654321'
     this.colLabels = 'abcdefgh'
 

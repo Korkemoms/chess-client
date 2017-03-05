@@ -273,8 +273,6 @@ class ChessGame extends React.Component {
   }
 
   render () {
-    console.log('Rendering ChessGame')
-
     // gather some info
 
     // const playerName = this.props.playerName
