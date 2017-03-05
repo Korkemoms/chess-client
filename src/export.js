@@ -1,10 +1,16 @@
 
 import React, { PropTypes } from 'react'
 import ChessGame from './containers/ChessGame'
+import Lobby from './containers/Lobby'
 
-import { createStore } from 'redux'
+import { createStore, applyMiddleware, combineReducers } from 'redux'
 import { Provider } from 'react-redux'
-import reducer from './reducers/ChessGame'
+import chessGameReducer from './reducers/ChessGame'
+import lobbyReducer from './reducers/Lobby'
+import { fetchPlayers } from './actions/Lobby'
+
+import thunkMiddleware from 'redux-thunk'
+import createLogger from 'redux-logger'
 
 import {
   Grid,
@@ -12,11 +18,24 @@ import {
   Col
 } from 'react-bootstrap'
 
-export default class Chess extends React.Component {
+const reducer = combineReducers({
+  chessGame: chessGameReducer,
+  lobby: lobbyReducer
+})
 
+export default class Chess extends React.Component {
   constructor () {
     super()
-    this.store = createStore(reducer)
+
+    this.loggerMiddleware = createLogger()
+
+    this.store = createStore(
+      reducer,
+      applyMiddleware(
+          thunkMiddleware, // lets us dispatch() functions
+          this.loggerMiddleware // neat middleware that logs actions
+        )
+    )
   }
 
   render () {
@@ -31,7 +50,7 @@ export default class Chess extends React.Component {
                 gameId={-1} />
             </Col>
             <Col sm={12} md={6}>
-              asdf
+              <Lobby myFetch={this.props.myFetch} />
             </Col>
           </Row>
 
