@@ -1,16 +1,24 @@
 import Lobby from '../components/Lobby'
 import { connect } from 'react-redux'
-import { fetchPlayers, selectPlayer } from '../actions/Lobby'
+import { selectPlayer, challengePlayer, fetchUpdates, selectGame } from '../actions/Lobby'
 
 const LobbyContainer = ((Target, namespace) => {
   const mapDispatchToProps = (dispatch) => {
     return {
-      fetchPlayers: (myFetch) => {
-        let action = fetchPlayers(myFetch)
+      fetchUpdates: (myFetch, updateIndex) => {
+        let action = fetchUpdates(myFetch, updateIndex)
         dispatch(action)
       },
-      selectPlayer: (playerEmail) => {
-        let action = selectPlayer(playerEmail)
+      challengePlayer: (myFetch, me, player) => {
+        let action = challengePlayer(myFetch, me, player)
+        dispatch(action)
+      },
+      selectPlayer: (player) => {
+        let action = selectPlayer(player)
+        dispatch(action)
+      },
+      selectGame: (game) => {
+        let action = selectGame(game)
         dispatch(action)
       }
     }
@@ -18,10 +26,7 @@ const LobbyContainer = ((Target, namespace) => {
 
   const mapStateToProps = (state) => {
     const localState = namespace ? state[namespace] : state
-    return {
-      players: localState.players,
-      selectedPlayerEmail: localState.selectedPlayerEmail
-    }
+    return Object.assign({}, localState)
   }
 
   return connect(mapStateToProps, mapDispatchToProps)(Target)

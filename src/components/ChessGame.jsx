@@ -72,7 +72,7 @@ cssIcon[bKnight] = '-b_knight'
 cssIcon[bPawn] = '-b_pawn'
 
 /**
- * Chess implementation without network play.
+ * Chess implementation.
  */
 class ChessGame extends React.Component {
 
@@ -82,17 +82,10 @@ class ChessGame extends React.Component {
   componentWillMount () {
     const _this = this
 
-    // _this.props.onInterval(_this)
-    this.timerId = window.setInterval(function () {
-      if (typeof (_this.props.onInterval) !== 'undefined') {
-        _this.props.onInterval(_this)
-      }
-    }, 2000)
-
     // update visualIndex if slider has been moved
     // do it in timer to avoid excessive amounts of re-renders
     // when dragging slider
-    _this.timerId2 = window.setInterval(function () {
+    _this.timerId = window.setInterval(function () {
       let update = typeof (_this.timeSliderValue) !== 'undefined'
       update &= _this.timeSliderValue !== _this.props.visualIndex
       update &= _this.timeSliderValueConsumed === false
@@ -109,7 +102,6 @@ class ChessGame extends React.Component {
    */
   componentWillUnmount () {
     window.clearInterval(this.timerId)
-    window.clearInterval(this.timerId2)
   }
 
   handleClick (row, col) {
@@ -262,6 +254,13 @@ class ChessGame extends React.Component {
       this.props.setDisplayConfirmation(false)
       this.props.setActualIndex(visualIndex)
       this.props.setVisualIndex(visualIndex)
+
+      let move = {
+        chess_game_id: this.props.gameId,
+        ...lastMove
+      }
+
+      this.props.sendMove(this.props.myFetch, move)
     } else {
       this.props.setDisplayConfirmation(true)
     }
@@ -291,6 +290,8 @@ class ChessGame extends React.Component {
     const actualIndex = this.props.actualIndex
     const actuallyMyTurn = (imWhite && actualIndex % 2 === 0) ||
     (!imWhite && actualIndex % 2 !== 0)
+    const canConfirmMove = actuallyMyTurn && visualIndex === actualIndex + 1 &&
+     this.props.gameId && this.props.gameId !== null
 
     return (
       <div className='Game-container'>
@@ -304,6 +305,7 @@ class ChessGame extends React.Component {
           opponentName={this.props.opponentName}
           playerName={this.props.playerName}
           onClick={(row, col) => this.handleClick(row, col)}
+          myColor={this.props.myColor}
         />
 
         <div className={'Player-bar-bottom'}>
@@ -328,7 +330,8 @@ class ChessGame extends React.Component {
 
           {
             !this.props.displayConfirmation
-            ? <Button disabled={!actuallyMyTurn || visualIndex !== actualIndex + 1}
+            ? <Button
+              disabled={!canConfirmMove}
               style={{margin: '0.4em 0.2em'}}
               bsStyle='primary'
               onClick={() => this.actuallyMove(false)}>Confirm move
@@ -385,9 +388,10 @@ ChessGame.propTypes = {
   visualIndex: PropTypes.number.isRequired,
   actualIndex: PropTypes.number.isRequired,
   displayConfirmation: PropTypes.bool.isRequired,
+  pieceMoved: PropTypes.func,
   opponentName: PropTypes.string.isRequired,
-  playerName: PropTypes.string.isRequired
-
+  playerName: PropTypes.string.isRequired,
+  myColor: PropTypes.string
 }
 
 export default ChessGame

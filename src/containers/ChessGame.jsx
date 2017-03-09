@@ -5,45 +5,40 @@ import {
   setVisualIndex,
   setActualIndex,
   setDisplayConfirmation,
-  setChessStateHistory
+  setChessStateHistory,
+  sendMove
 } from '../actions/ChessGame'
 
 const ChessGameContainer = ((Target, namespace) => {
   const mapDispatchToProps = (dispatch) => {
     return {
       setFocus: (row, col) => {
-        let action = setFocus(row, col)
-        dispatch(action)
+        dispatch(setFocus(row, col))
       },
       setVisualIndex: (index) => {
-        let action = setVisualIndex(index)
-        dispatch(action)
+        dispatch(setVisualIndex(index))
       },
       setActualIndex: (index) => {
-        let action = setActualIndex(index)
-        dispatch(action)
+        dispatch(setActualIndex(index))
+      },
+      setActualIndex: (index) => {
+        dispatch(setActualIndex(index))
       },
       setDisplayConfirmation: (displayConfirmation) => {
-        let action = setDisplayConfirmation(displayConfirmation)
-        dispatch(action)
+        dispatch(setDisplayConfirmation(displayConfirmation))
       },
       setChessStateHistory: (chessStateHistory) => {
-        let action = setChessStateHistory(chessStateHistory)
-        dispatch(action)
+        dispatch(setChessStateHistory(chessStateHistory))
+      },
+      sendMove: (myFetch, move) => {
+        dispatch(sendMove(myFetch, move))
       }
     }
   }
 
   const mapStateToProps = (state) => {
     const localState = namespace ? state[namespace] : state
-    return {
-      focusRow: localState.focusRow,
-      focusCol: localState.focusCol,
-      visualIndex: localState.visualIndex,
-      actualIndex: localState.actualIndex,
-      displayConfirmation: localState.displayConfirmation,
-      chessStateHistory: localState.chessStateHistory
-    }
+    return Object.assign({}, localState)
   }
 
   return connect(mapStateToProps, mapDispatchToProps)(Target)

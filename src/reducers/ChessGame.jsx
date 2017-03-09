@@ -5,16 +5,21 @@ chessState.init()
 const chessStateHistory = []
 chessStateHistory.push(chessState)
 
-const initialState = {
+export const chessGameInitialState = {
   focusRow: -1,
   focusCol: -1,
   visualIndex: 0,
   actualIndex: 0,
+  myEmail: null,
+  myName: null,
   displayConfirmation: false,
-  chessStateHistory: chessStateHistory
+  chessStateHistory: chessStateHistory,
+  playerName: 'Player1',
+  opponentName: 'Player2',
+  myColor: 'White'
 }
 
-const update = (state = initialState, action) => {
+const update = (state = chessGameInitialState, action) => {
   switch (action.type) {
     case 'SET_FOCUS':
       return Object.assign({}, state, {
@@ -37,6 +42,23 @@ const update = (state = initialState, action) => {
       return Object.assign({}, state, {
         chessStateHistory: action.chessStateHistory
       })
+    case 'SELECT_GAME': {
+      let imChallenger = action.selectedGame.challengerEmail === state.myEmail
+      let opponentName = imChallenger ? action.selectedGame.opponentName
+        : action.selectedGame.challengerName
+
+      return Object.assign({}, state, {
+        playerName: state.myName,
+        opponentName: opponentName,
+        gameId: action.selectedGame.id,
+        myColor: imChallenger ? 'White' : 'Black'
+      })
+    }
+    case 'APP_RECEIVE_PROPS': {
+      return Object.assign({}, state, {
+        ...action.props
+      })
+    }
     default:
       return state
   }

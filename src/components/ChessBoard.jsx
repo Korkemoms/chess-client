@@ -5,7 +5,7 @@
  */
 
 import '../Chess.scss'
-import React from 'react'
+import React, { PropTypes } from 'react'
 
 import wKingIcon from '../images/chess_pieces/w_king.png'
 import wQueenIcon from '../images/chess_pieces/w_queen.png'
@@ -373,4 +373,9 @@ export default class ChessBoard extends React.Component {
       </div>
     )
   }
+}
+
+ChessBoard.propTypes = {
+  myColor: PropTypes.string
+
 }

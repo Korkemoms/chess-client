@@ -5,9 +5,8 @@ import Lobby from './containers/Lobby'
 
 import { createStore, applyMiddleware, combineReducers } from 'redux'
 import { Provider } from 'react-redux'
-import chessGameReducer from './reducers/ChessGame'
-import lobbyReducer from './reducers/Lobby'
-import { fetchPlayers } from './actions/Lobby'
+import chessGameReducer, { chessGameInitialState } from './reducers/ChessGame'
+import lobbyReducer, { lobbyInitialState } from './reducers/Lobby'
 
 import thunkMiddleware from 'redux-thunk'
 import createLogger from 'redux-logger'
@@ -23,37 +22,47 @@ const reducer = combineReducers({
   lobby: lobbyReducer
 })
 
-export default class Chess extends React.Component {
-  constructor () {
-    super()
+const initialState = {
+  chessGame: chessGameInitialState,
+  lobby: lobbyInitialState
+}
 
-    this.loggerMiddleware = createLogger()
+const loggerMiddleware = createLogger()
 
-    this.store = createStore(
-      reducer,
-      applyMiddleware(
-          thunkMiddleware, // lets us dispatch() functions
-          this.loggerMiddleware // neat middleware that logs actions
-        )
+const store = createStore(
+  reducer,
+  initialState,
+  applyMiddleware(
+      thunkMiddleware, // lets us dispatch() functions
+      loggerMiddleware // neat middleware that logs actions
     )
+)
+
+export default class Chess extends React.Component {
+
+  componentWillUpdate (nextProps) {
+    const receiveProps = (props) => {
+      return {
+        type: 'APP_RECEIVE_PROPS',
+        props: props
+      }
+    }
+
+    store.dispatch(receiveProps(nextProps))
   }
 
   render () {
     return (
-      <Provider store={this.store}>
+      <Provider store={store}>
         <Grid>
           <Row>
             <Col sm={12} md={6}>
-              <ChessGame myColor='White'
-                playerName='Player1'
-                opponentName='Player2'
-                gameId={-1} />
+              <ChessGame />
             </Col>
             <Col sm={12} md={6}>
-              <Lobby myFetch={this.props.myFetch} />
+              <Lobby />
             </Col>
           </Row>
-
         </Grid>
       </Provider>
     )
@@ -61,5 +70,7 @@ export default class Chess extends React.Component {
 }
 
 Chess.propTypes = {
-  jwToken: PropTypes.string
+  myFetch: PropTypes.func,
+  myEmail: PropTypes.string,
+  myName: PropTypes.string
 }

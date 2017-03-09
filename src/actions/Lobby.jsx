@@ -1,47 +1,109 @@
-// determine where to send requests
-const www = window.location.href.indexOf('www.') !== -1 ? 'www.' : ''
-const url = process.env.NODE_ENV === 'production'
-  ? `http://${www}amodahl.no/api/public` : `http://${www}local.amodahl.no`
 
 export const receivePlayers = (players) => {
   return {
     type: 'RECEIVE_PLAYERS',
-    players: players
+    players: players.slice()
   }
 }
 
-export const selectPlayer = (playerEmail) => {
+export const receiveChessGames = (chessGames) => {
+  return {
+    type: 'RECEIVE_CHESS_GAMES',
+    chessGames: chessGames.slice()
+  }
+}
+
+export const receiveUpdates = (players) => {
+  return {
+    type: 'RECEIVE_UPDATES',
+    players: players.slice()
+  }
+}
+
+export const selectPlayer = (player) => {
   return {
     type: 'SELECT_PLAYER',
-    selectedPlayerEmail: playerEmail
+    selectedPlayer: player
   }
 }
 
-export const requestPlayersFailed = (message, displayMessage) => {
+export const selectGame = (game) => {
   return {
-    type: 'REQUEST_PLAYERS_FAILED',
+    type: 'SELECT_GAME',
+    selectedGame: game
+  }
+}
+
+export const _challengePlayer = (playerEmail) => {
+  return {
+    type: 'CHALLENGE_PLAYER',
+    challengedPlayerEmail: playerEmail
+  }
+}
+
+export const challengePlayerFailed = (playerEmail) => {
+  return {
+    type: 'CHALLENGE_PLAYER_FAILED',
+    challengedPlayerEmail: playerEmail
+  }
+}
+
+export const requestUpdatesFailed = (message, displayMessage) => {
+  return {
+    type: 'REQUEST_UPDATES_FAILED',
     message: message
   }
 }
 
-export const requestPlayers = () => {
+export const requestUpdates = (updateIndex) => {
   return {
-    type: 'REQUEST_PLAYERS'
+    type: 'REQUEST_UPDATES',
+    updateIndex: updateIndex
   }
 }
 
-export const fetchPlayers = (myFetch) => {
+export const challengePlayer = (myFetch, me, player) => {
   return (dispatch) => {
-    dispatch(requestPlayers())
+    console.log(me, player)
+    dispatch(_challengePlayer(player.email))
 
-    return myFetch('/users', {
-      method: 'GET'
-    })
-    .then(result => {
-      dispatch(receivePlayers(result.data))
+    var form = new FormData()
+    form.append('challenger_email', me.email)
+    form.append('opponent_email', player.email)
+    form.append('challenger_name', me.name)
+    form.append('opponent_name', player.name)
+
+    return myFetch('/chess-games', {
+      method: 'POST',
+      body: form
     })
     .catch(error => { // handle errors
-      dispatch(requestPlayersFailed('Something went wrong: ' + error, true))
+      dispatch(challengePlayerFailed('Something went wrong: ' + error))
+    })
+  }
+}
+
+export const fetchUpdates = (myFetch, updateIndex) => {
+  return (dispatch) => {
+    // dispatch(requestUpdates(updateIndex))
+
+    // dont need the players if no change since last time
+    let headers = new Headers()
+    headers.append('update-index', updateIndex)
+
+    return myFetch('/updates', {
+      method: 'GET',
+      headers
+    }, (json, headers) => {
+      if (json.players.data.length > 0) {
+        dispatch(receivePlayers(json.players.data))
+      }
+      if (json.chessGames.data.length > 0) {
+        dispatch(receiveChessGames(json.chessGames.data))
+      }
+    })
+    .catch(error => { // handle errors
+      dispatch(requestUpdatesFailed('Something went wrong: ' + error))
     })
   }
 }
