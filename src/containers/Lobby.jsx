@@ -6,20 +6,16 @@ const LobbyContainer = ((Target, namespace) => {
   const mapDispatchToProps = (dispatch) => {
     return {
       fetchUpdates: (myFetch, updateIndex) => {
-        let action = fetchUpdates(myFetch, updateIndex)
-        dispatch(action)
+        dispatch(fetchUpdates(myFetch, updateIndex))
       },
       challengePlayer: (myFetch, me, player) => {
-        let action = challengePlayer(myFetch, me, player)
-        dispatch(action)
+        dispatch(challengePlayer(myFetch, me, player))
       },
       selectPlayer: (player) => {
-        let action = selectPlayer(player)
-        dispatch(action)
+        dispatch(selectPlayer(player))
       },
-      selectGame: (game) => {
-        let action = selectGame(game)
-        dispatch(action)
+      selectGame: (game, moves) => {
+        dispatch(selectGame(game, moves))
       }
     }
   }

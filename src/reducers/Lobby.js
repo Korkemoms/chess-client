@@ -1,9 +1,11 @@
 export const lobbyInitialState = {
   players: [],
   chessGames: [],
+  chessMoves: {},
   updateIndex: -1,
   myEmail: null,
   myName: null,
+  myFetch: null,
   selectedPlayerId: null,
   selectedGameId: localStorage.getItem('selectedGameId')
 }
@@ -11,7 +13,7 @@ export const lobbyInitialState = {
 export default function update (state = lobbyInitialState, action) {
   switch (action.type) {
     case 'RECEIVE_PLAYERS': {
-      let current = state.players
+      let current = state.players // its not copied!
       let updated = action.players
 
       // remove from current any that also is in updated
@@ -31,12 +33,12 @@ export default function update (state = lobbyInitialState, action) {
 
       return Object.assign({}, state, {
         players: players,
-        updateIndex: updateIndex
+        updateIndex: updateIndex // if there is change the update index will change
       })
     }
 
     case 'RECEIVE_CHESS_GAMES': {
-      let current = state.chessGames
+      let current = state.chessGames // its not copied!
       let updated = action.chessGames
 
       // remove from current any that also is in updated
@@ -56,7 +58,28 @@ export default function update (state = lobbyInitialState, action) {
 
       return Object.assign({}, state, {
         chessGames: chessGames,
-        updateIndex: updateIndex
+        updateIndex: updateIndex // if there is change the update index will change
+      })
+    }
+    case 'RECEIVE_CHESS_MOVES': {
+      let local = state.chessMoves // its not copied!
+
+      // store the moves in one object per chess game
+      let updateIndex = state.updateIndex
+      action.chessMoves.forEach(chessMove => {
+        if (!(chessMove.chessGameId.toString() in local)) {
+          local[chessMove.chessGameId.toString()] = {}
+        }
+        local[chessMove.chessGameId.toString()][chessMove.id] = chessMove
+
+        if (chessMove.updateIndex > updateIndex) {
+          updateIndex = chessMove.updateIndex
+        }
+      })
+
+      return Object.assign({}, state, {
+        chessMoves: local,
+        updateIndex: updateIndex // if there is change the update index will change
       })
     }
 
@@ -67,7 +90,6 @@ export default function update (state = lobbyInitialState, action) {
       })
     case 'SELECT_GAME': {
       localStorage.setItem('selectedGameId', action.selectedGameId)
-
       return Object.assign({}, state, {
         selectedGameId: action.selectedGame.id
       })

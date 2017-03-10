@@ -12,11 +12,13 @@ export const chessGameInitialState = {
   actualIndex: 0,
   myEmail: null,
   myName: null,
+  gameId: null,
   displayConfirmation: false,
   chessStateHistory: chessStateHistory,
   playerName: 'Player1',
   opponentName: 'Player2',
-  myColor: 'White'
+  myColor: 'White',
+  spectator: true
 }
 
 const update = (state = chessGameInitialState, action) => {
@@ -42,18 +44,64 @@ const update = (state = chessGameInitialState, action) => {
       return Object.assign({}, state, {
         chessStateHistory: action.chessStateHistory
       })
-    case 'SELECT_GAME': {
-      let imChallenger = action.selectedGame.challengerEmail === state.myEmail
-      let opponentName = imChallenger ? action.selectedGame.opponentName
-        : action.selectedGame.challengerName
+    case 'CLEAR_CHESS_GAME' : {
+      const chessState = new ChessRules()
+      chessState.init()
+      const chessStateHistory = []
+      chessStateHistory.push(chessState)
 
       return Object.assign({}, state, {
-        playerName: state.myName,
-        opponentName: opponentName,
-        gameId: action.selectedGame.id,
-        myColor: imChallenger ? 'White' : 'Black'
+        focusRow: -1,
+        focusCol: -1,
+        visualIndex: 0,
+        actualIndex: 0,
+        gameId: null,
+        displayConfirmation: false,
+        chessStateHistory: chessStateHistory,
+        playerName: 'Player1',
+        opponentName: 'Player2',
+        myColor: 'White',
+        spectator: true
       })
     }
+
+    case 'SELECT_GAME': {
+      let imChallenger = action.selectedGame.challengerEmail === state.myEmail
+
+      let playerName = !imChallenger ? action.selectedGame.opponentName
+        : action.selectedGame.challengerName
+      let playerEmail = !imChallenger ? action.selectedGame.opponentEmail
+          : action.selectedGame.challengerEmail
+
+      let opponentName = imChallenger ? action.selectedGame.opponentName
+        : action.selectedGame.challengerName
+      let opponentEmail = imChallenger ? action.selectedGame.opponentEmail
+          : action.selectedGame.challengerEmail
+
+      let spectator = opponentEmail !== state.myEmail && playerEmail !== state.myEmail
+
+      const chessState = new ChessRules()
+      chessState.init()
+      const chessStateHistory = []
+      chessStateHistory.push(chessState)
+
+      return Object.assign({}, state, {
+        focusRow: -1,
+        focusCol: -1,
+        visualIndex: 0,
+        actualIndex: 0,
+        playerName: playerName,
+        playerEmail: playerEmail,
+        opponentName: opponentName,
+        opponentEmail: opponentEmail,
+        chessStateHistory: chessStateHistory,
+        gameId: action.selectedGame.id,
+        displayConfirmation: false,
+        myColor: imChallenger ? 'White' : 'Black',
+        spectator: spectator
+      })
+    }
+
     case 'APP_RECEIVE_PROPS': {
       return Object.assign({}, state, {
         ...action.props

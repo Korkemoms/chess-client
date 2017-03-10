@@ -18,19 +18,32 @@ let fetched = 0
 
 class Lobby extends React.Component {
 
-  componentDidUpdate () {
-    if (this.props.myFetch && this.props.myFetch !== null && fetched++ === 0) {
-      this.props.fetchUpdates(this.props.myFetch, this.props.updateIndex)
-    }
+  componentWillMount () {
+    let _this = this
+    this.intervalId = setInterval(() => {
+      let props = _this.props
+      let loggedIn = props.myName !== null &&
+        props.myEmail !== null &&
+        props.myFetch !== null
+      if (loggedIn) {
+        props.fetchUpdates(props.myFetch, props.updateIndex)
+      }
+    }, 3000)
   }
 
-  componentDidMount () {
-    if (this.props.myFetch && this.props.myFetch !== null && fetched++ === 0) {
-      this.props.fetchUpdates(this.props.myFetch, this.props.updateIndex)
+  componentWillUpdate (nextProps) {
+    if (this.once) {
+      return
     }
-    this.intervalId = setInterval(() => {
-      this.props.fetchUpdates(this.props.myFetch, this.props.updateIndex)
-    }, 3000)
+    this.once = true
+
+    let loggedIn = nextProps.myName !== null &&
+      nextProps.myEmail !== null &&
+      nextProps.myFetch !== null
+
+    if (loggedIn) {
+      this.props.fetchUpdates(nextProps.myFetch, nextProps.updateIndex)
+    }
   }
 
   componentWillUnmount () {
@@ -38,91 +51,115 @@ class Lobby extends React.Component {
   }
 
   render () {
+    let loggedIn = this.props.myName !== null &&
+      this.props.myEmail !== null &&
+      this.props.myFetch !== null
+
+    let userInfo = loggedIn
+    ? <div>
+      <label>{'Username:'}</label>{' ' + this.props.myName}<br />
+      <label>{'Email:'}</label>{' ' + this.props.myEmail}
+    </div>
+    : <div><label>Log in to play against others</label></div>
+
+    let challengeButton = loggedIn
+    ? <Form inline>
+      <FormGroup controlId='formInlineName'>
+        <Button disabled={this.props.selectedPlayerId === null}
+          bsStyle='primary'
+          onClick={() => this.props.challengePlayer(
+            this.props.myFetch,
+            {email: this.props.myEmail, name: this.props.myName},
+            this.props.selectedPlayer)}>
+        Challenge</Button>
+      </FormGroup></Form>
+    : null
+
+    let playerTab = loggedIn
+    ? <Tab.Pane eventKey='players'>
+      <ListGroup>
+        {this.props.players.map((player, index) => {
+          let active = player.id === this.props.selectedPlayerId
+          return <ListGroupItem
+            header={active ? player.name : null}
+
+            key={index}
+            onClick={() => this.props.selectPlayer(player)}>
+            {active ? null : player.name}
+            {active ? challengeButton : null}
+
+          </ListGroupItem>
+        })}
+      </ListGroup>
+
+    </Tab.Pane>
+    : null
+
+    let gamesTab = loggedIn
+    ? <Tab.Pane eventKey='my-games'>
+      <ListGroup>
+
+        {this.props.chessGames.map((chessGame, index) =>
+          <ListGroupItem
+            active={chessGame.id === this.props.selectedGameId}
+            key={index}
+            onClick={() => {
+              let moves = chessGame.id in this.props.chessMoves ?
+              Object.values(this.props.chessMoves[chessGame.id]) : []
+              this.props.selectGame(chessGame, moves)
+            }}>
+            {`${chessGame.challengerName} vs ${chessGame.opponentName}`}
+          </ListGroupItem>
+        )}
+      </ListGroup>
+    </Tab.Pane>
+    : null
+
+    let chatTab = loggedIn
+    ? <Tab.Pane eventKey='chat'>
+      <ListGroup>
+        <ListGroupItem>Chat message</ListGroupItem>
+      </ListGroup>
+      <Form inline>
+        <FormGroup controlId='formInlineName'>
+          <FormControl disabled type='text' placeholder='Jane Doe' />
+          <Button disabled bsStyle='primary'>Send</Button>
+        </FormGroup>
+      </Form>
+    </Tab.Pane>
+    : null
+
+    let tab = loggedIn
+    ? <Tab.Container defaultActiveKey={loggedIn ? 'players' : 'unknown-tab'} id='game-tab'>
+      <Row className='clearfix'>
+        <Col sm={12}>
+          <Nav bsStyle='pills'>
+            <NavItem disabled={!loggedIn} eventKey='chat'>
+                    Messages
+                </NavItem>
+            <NavItem disabled={!loggedIn} eventKey='players'>
+                    Players
+                </NavItem>
+            <NavItem disabled={!loggedIn} eventKey='my-games'>
+                    Games
+                </NavItem>
+          </Nav>
+        </Col>
+        <Col sm={12}>
+          <Tab.Content animation>
+            {playerTab}
+            {gamesTab}
+            {chatTab}
+          </Tab.Content>
+        </Col>
+      </Row>
+    </Tab.Container>
+            : null
+
     return (
       <div>
-        <label>{'Username:'}</label>{' ' + this.props.myName}<br />
-        <label>{'Email:'}</label>{' ' + this.props.myEmail}
-        <Tab.Container defaultActiveKey='players' id='game-tab'>
-          <Row className='clearfix'>
-            <Col sm={12}>
-              <Nav bsStyle='pills'>
-                <NavItem disabled eventKey='chat'>
-                Messages
-            </NavItem>
-                <NavItem eventKey='players'>
-                Players
-            </NavItem>
-                <NavItem eventKey='my-games'>
-                Games
-            </NavItem>
-              </Nav>
-            </Col>
-            <Col sm={12}>
-              <Tab.Content animation>
-                <Tab.Pane eventKey='players'>
-                  <ListGroup>
-
-                    {this.props.players.map((player, index) =>
-                      <ListGroupItem
-                        active={player.id === this.props.selectedPlayerId}
-                        key={index}
-                        onClick={() => this.props.selectPlayer(player)}>
-                        {player.name}
-                      </ListGroupItem>
-                    )}
-
-                  </ListGroup>
-                  <Form inline>
-                    <FormGroup controlId='formInlineName'>
-                      <Button disabled={this.props.selectedPlayerId === null}
-                        bsStyle='primary'
-                        onClick={() => this.props.challengePlayer(
-                          this.props.myFetch,
-                          {email: this.props.myEmail, name: this.props.myName},
-                          this.props.selectedPlayer)}>
-                      Challenge</Button>
-                    </FormGroup>
-                  </Form>
-                </Tab.Pane>
-
-                <Tab.Pane eventKey='my-games'>
-                  <ListGroup>
-
-                    {this.props.chessGames.map((chessGame, index) =>
-                      <ListGroupItem
-                        active={chessGame.id === this.props.selectedGameId}
-                        key={index}
-                        onClick={() => this.props.selectGame(chessGame)}>
-                        {`${chessGame.challengerName} vs ${chessGame.opponentName}`}
-                      </ListGroupItem>
-                    )}
-
-                  </ListGroup>
-                  <Form inline>
-                    <FormGroup controlId='formInlineName'>
-                      <Button bsStyle='primary'
-                        disabled={this.props.selectedGameId === null}>
-                        Do something</Button>
-                    </FormGroup>
-
-                  </Form>
-                </Tab.Pane>
-
-                <Tab.Pane eventKey='chat'>
-                  <ListGroup>
-                    <ListGroupItem>Chat message</ListGroupItem>
-                  </ListGroup>
-                  <Form inline>
-                    <FormGroup controlId='formInlineName'>
-                      <FormControl disabled type='text' placeholder='Jane Doe' />
-                      <Button disabled bsStyle='primary'>Send</Button>
-                    </FormGroup>
-                  </Form>
-                </Tab.Pane>
-              </Tab.Content>
-            </Col>
-          </Row>
-        </Tab.Container>
+        {userInfo}
+        {tab}
       </div>
     )
   }
@@ -137,6 +174,7 @@ Lobby.propTypes = {
   challengePlayer: PropTypes.func,
   myEmail: PropTypes.string,
   myName: PropTypes.string,
+  myFetch: PropTypes.func,
   players: PropTypes.array,
   chessGames: PropTypes.array,
   fetchUpdates: PropTypes.func,

@@ -40,6 +40,19 @@ const store = createStore(
 
 export default class Chess extends React.Component {
 
+  componentWillMount () {
+    const receiveProps = (props) => {
+      return {
+        type: 'APP_RECEIVE_PROPS',
+        props: props
+      }
+    }
+
+    console.log(this.props)
+
+    store.dispatch(receiveProps(this.props))
+  }
+
   componentWillUpdate (nextProps) {
     const receiveProps = (props) => {
       return {
@@ -57,11 +70,12 @@ export default class Chess extends React.Component {
         <Grid>
           <Row>
             <Col sm={12} md={6}>
-              <ChessGame />
-            </Col>
-            <Col sm={12} md={6}>
               <Lobby />
             </Col>
+            <Col sm={12} md={6}>
+              <ChessGame />
+            </Col>
+
           </Row>
         </Grid>
       </Provider>

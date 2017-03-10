@@ -6,7 +6,10 @@ import {
   setActualIndex,
   setDisplayConfirmation,
   setChessStateHistory,
-  sendMove
+  sendMove,
+  move,
+  handleClick,
+  actuallyMove
 } from '../actions/ChessGame'
 
 const ChessGameContainer = ((Target, namespace) => {
@@ -30,8 +33,17 @@ const ChessGameContainer = ((Target, namespace) => {
       setChessStateHistory: (chessStateHistory) => {
         dispatch(setChessStateHistory(chessStateHistory))
       },
-      sendMove: (myFetch, move) => {
-        dispatch(sendMove(myFetch, move))
+      sendMove: (...args) => {
+        dispatch(sendMove(...args))
+      },
+      handleClick: props => (...args) => {
+        dispatch(handleClick(props)(...args))
+      },
+      actuallyMove: props => (...args) => {
+        dispatch(actuallyMove(props)(...args))
+      },
+      move: props => (...args) => {
+        dispatch(move(props)(...args))
       }
     }
   }

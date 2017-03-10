@@ -142,83 +142,9 @@ class ChessGame extends React.Component {
       let lastMoveNumber = chessState.moves.length > 0
       ? chessState.moves[chessState.moves.length - 1].number : 0
 
-      this.move(focusRow, focusCol, row, col, lastMoveNumber + 1, false)
+      this.props.move(this.props)(focusRow, focusCol, row, col, lastMoveNumber + 1,
+        false, this.props.actualIndex, this.props.visualIndex, this.props.chessStateHistory)
     }
-  }
-
-  /**
-   * Move one piece
-   * @param fromRow
-   * @param fromCol
-   * @param toRow
-   * @param toCol
-   * @param number move number, to avoid performing the same move twice.
-   * @param actual
-   * @returns state the chess state after the moves
-   */
-  move (fromRow, fromCol, toRow, toCol, number, actual) {
-    number = Number(number)
-
-    const index = actual ? this.props.actualIndex : this.props.visualIndex
-    const chessState = this.props.chessStateHistory[index]
-
-    let lastMoveNumber = chessState.moves.length > 0 ? chessState.moves[chessState.moves.length - 1].number : 0
-
-    if (number !== lastMoveNumber + 1) {
-      console.log('Duplicate move (' + number + '), ignoring')
-      return null
-    }
-
-    const newState = chessState.move(fromRow, fromCol, toRow, toCol)
-
-    const newHistory = this.props.chessStateHistory.slice(0, index + 1)
-    newHistory.push(newState)
-
-    this.props.setChessStateHistory(newHistory)
-    this.props.setVisualIndex(index + 1)
-    if (actual) {
-      this.props.setActualIndex(this.props.actualIndex + 1)
-    }
-
-    this.props.setFocus(-1, -1)
-
-    return newState
-  }
-
-  /**
-   * Perform many moves
-   * @param moves
-   * @returns the chess state after the moves
-   */
-  moveMany (moves, actual) {
-    if (moves.length === 0) return
-
-    let index = actual ? this.props.actualIndex : this.props.visualIndex
-    let chessState = this.props.chessStateHistory[index]
-    const newHistory = this.props.chessStateHistory.slice()
-
-    let lastMoveNumber = chessState.moves.length > 0 ? chessState.moves[chessState.moves.length - 1].number : 0
-
-    moves.forEach(function (move) {
-      let number = Number(move.number)
-      if (number === lastMoveNumber + 1) {
-        chessState = chessState.move(move.fromRow, move.fromCol, move.toRow, move.toCol)
-        newHistory.push(chessState)
-        index++
-        lastMoveNumber++
-      } else {
-        console.log('Duplicate move (' + number + '), ignoring')
-      }
-    })
-
-    this.props.setChessStateHistory(newHistory)
-    this.props.setVisualIndex(index)
-    if (actual) {
-      this.props.setActualIndex(index)
-    }
-    this.props.setFocus(-1, -1)
-
-    return chessState
   }
 
   forward () {
@@ -237,33 +163,6 @@ class ChessGame extends React.Component {
     if (this.props.visualIndex <= 0) return // its already min
 
     this.props.setVisualIndex(this.props.visualIndex - 1)
-  }
-
-  actuallyMove (confirmed) {
-    if (confirmed) {
-      const chessStateHistory = this.props.chessStateHistory
-      const chessState = chessStateHistory[this.props.actualIndex + 1]
-      const lastMove = chessState.moves[chessState.moves.length - 1].copy()
-
-      if (typeof (this.props.onMove) !== 'undefined') {
-        this.props.onMove(this, lastMove, this.props.playerName)
-      }
-
-      let visualIndex = this.props.actualIndex + 1
-
-      this.props.setDisplayConfirmation(false)
-      this.props.setActualIndex(visualIndex)
-      this.props.setVisualIndex(visualIndex)
-
-      let move = {
-        chess_game_id: this.props.gameId,
-        ...lastMove
-      }
-
-      this.props.sendMove(this.props.myFetch, move)
-    } else {
-      this.props.setDisplayConfirmation(true)
-    }
   }
 
   sliderMoved (value) {
@@ -289,9 +188,11 @@ class ChessGame extends React.Component {
 
     const actualIndex = this.props.actualIndex
     const actuallyMyTurn = (imWhite && actualIndex % 2 === 0) ||
-    (!imWhite && actualIndex % 2 !== 0)
+      (!imWhite && actualIndex % 2 !== 0) ||
+      this.props.playerEmail === this.props.opponentEmail
+
     const canConfirmMove = actuallyMyTurn && visualIndex === actualIndex + 1 &&
-     this.props.gameId && this.props.gameId !== null
+     this.props.gameId && this.props.gameId !== null && !this.props.spectator
 
     return (
       <div className='Game-container'>
@@ -334,7 +235,8 @@ class ChessGame extends React.Component {
               disabled={!canConfirmMove}
               style={{margin: '0.4em 0.2em'}}
               bsStyle='primary'
-              onClick={() => this.actuallyMove(false)}>Confirm move
+              onClick={() => this.props.actuallyMove(this.props)(false, this.props.chessStateHistory,
+                this.props.actualIndex)}>Confirm move
               </Button>
               : ''
           }
@@ -350,7 +252,8 @@ class ChessGame extends React.Component {
             this.props.displayConfirmation
             ? <Button style={{margin: '0.4em 0.2em'}}
               bsStyle='warning'
-              onClick={() => this.actuallyMove(true)}>I'm sure
+              onClick={() => this.props.actuallyMove(this.props)(true, this.props.chessStateHistory,
+                this.props.actualIndex)}>I'm sure
               </Button>
               : ''
           }
@@ -391,7 +294,8 @@ ChessGame.propTypes = {
   pieceMoved: PropTypes.func,
   opponentName: PropTypes.string.isRequired,
   playerName: PropTypes.string.isRequired,
-  myColor: PropTypes.string
+  myColor: PropTypes.string,
+  spectator: PropTypes.bool
 }
 
 export default ChessGame
