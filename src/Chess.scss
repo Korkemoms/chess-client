@@ -28,7 +28,7 @@ $background-color2: #A5BAA0;
 }
 
 .Time-slider-container {
-  width: 100%;
+  width: 90%;
   margin: 0 2%;
 }
 
@@ -302,6 +302,25 @@ $background-color2: #A5BAA0;
     background-color: gray;
     cursor: default;
   }
+}
+
+.panel-heading {
+  cursor: pointer;
+}
+
+.inactive:before{
+  position: absolute;
+  content: '';
+  vertical-align:middle;
+  text-align: center;
+  background: rgba(255,255,255, 0.9);
+  width: 100%;
+  height: 100%;
+  z-index: 9000;
+}
+
+.panel-title a {
+  cursor: pointer;
 }
 
 .Link {
