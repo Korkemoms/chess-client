@@ -9,43 +9,22 @@ import {
   sendMove,
   move,
   handleClick,
-  actuallyMove
+  actuallyMove,
+  receiveChessMoves
 } from '../actions/ChessGame'
 
 const ChessGameContainer = ((Target, namespace) => {
-  const mapDispatchToProps = (dispatch) => {
-    return {
-      setFocus: (row, col) => {
-        dispatch(setFocus(row, col))
-      },
-      setVisualIndex: (index) => {
-        dispatch(setVisualIndex(index))
-      },
-      setActualIndex: (index) => {
-        dispatch(setActualIndex(index))
-      },
-      setActualIndex: (index) => {
-        dispatch(setActualIndex(index))
-      },
-      setDisplayConfirmation: (displayConfirmation) => {
-        dispatch(setDisplayConfirmation(displayConfirmation))
-      },
-      setChessStateHistory: (chessStateHistory) => {
-        dispatch(setChessStateHistory(chessStateHistory))
-      },
-      sendMove: (...args) => {
-        dispatch(sendMove(...args))
-      },
-      handleClick: props => (...args) => {
-        dispatch(handleClick(props)(...args))
-      },
-      actuallyMove: props => (...args) => {
-        dispatch(actuallyMove(props)(...args))
-      },
-      move: props => (...args) => {
-        dispatch(move(props)(...args))
-      }
-    }
+  const mapDispatchToProps = {
+    setFocus,
+    setVisualIndex,
+    setActualIndex,
+    setDisplayConfirmation,
+    setChessStateHistory,
+    sendMove,
+    move,
+    handleClick,
+    actuallyMove,
+    receiveChessMoves
   }
 
   const mapStateToProps = (state) => {
