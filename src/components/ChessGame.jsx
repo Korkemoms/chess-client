@@ -104,64 +104,25 @@ class ChessGame extends React.Component {
     window.clearInterval(this.timerId)
   }
 
-  handleClick (row, col) {
-    // gather some info
-
-    const visualIndex = this.props.visualIndex
-    const chessState = this.props.chessStateHistory[visualIndex]
-    const focusRow = this.props.focusRow
-    const focusCol = this.props.focusCol
-    const gotFocus = focusRow !== -1 && focusCol !== -1
-    const haveOpponent = this.props.opponentName !== null
-    const future = this.props.visualIndex >= this.props.actualIndex
-
-    // determine what to do
-    const focusPiece = gotFocus ? chessState.getPiece(focusRow, focusCol) : null
-    const clickedPiece = chessState.getPiece(row, col)
-    const focusColor = focusPiece !== null ? focusPiece.color : ''
-
-    let setFocus = !clickedPiece.isEmpty() && !gotFocus &&
-    clickedPiece.color === chessState.whoseTurn && future
-    let unFocus = gotFocus && focusRow === row &&
-      focusCol === col && future
-    let move = focusColor === chessState.whoseTurn && gotFocus &&
-      chessState.canMove(focusRow, focusCol, row, col) && haveOpponent && future
-
-    // do it
-    if (setFocus) { // lift up the piece
-      const newHistory = this.props.chessStateHistory.slice()
-
-      this.props.setChessStateHistory(newHistory)
-      this.props.setFocus(row, col)
-    } else if (unFocus) { // put the piece back
-      const newHistory = this.props.chessStateHistory.slice()
-
-      this.props.setChessStateHistory(newHistory)
-      this.props.setFocus(-1, -1)
-    } else if (move) { // move the piece
-      let lastMoveNumber = chessState.moves.length > 0
-      ? chessState.moves[chessState.moves.length - 1].number : 0
-
-      this.props.move(this.props)(focusRow, focusCol, row, col, lastMoveNumber + 1,
-        false, this.props.actualIndex, this.props.visualIndex, this.props.chessStateHistory)
-    }
-  }
-
   forward () {
-    if (this.props.visualIndex >= this.props.chessStateHistory.length) return // its already max
+    if (this.props.visualIndex >= this.props.chessStateHistory.length) {
+      return // its already max
+    }
 
     this.props.setVisualIndex(this.props.visualIndex + 1)
   }
 
   now () {
-    if (this.props.visualIndex === this.props.actualIndex) return // its already now
-
+    if (this.props.visualIndex === this.props.actualIndex) {
+      return // its already now
+    }
     this.props.setVisualIndex(this.props.actualIndex)
   }
 
   backward () {
-    if (this.props.visualIndex <= 0) return // its already min
-
+    if (this.props.visualIndex <= 0) {
+      return // its already min
+    }
     this.props.setVisualIndex(this.props.visualIndex - 1)
   }
 
@@ -194,8 +155,11 @@ class ChessGame extends React.Component {
     const canConfirmMove = actuallyMyTurn && visualIndex === actualIndex + 1 &&
      this.props.gameId && this.props.gameId !== null && !this.props.spectator
 
+    const active = this.props.gameId !== null
+    const css = 'Game-container' + (active ? '' : ' inactive')
+
     return (
-      <div className='Game-container'>
+      <div id='Chess-game-container' className={css}>
         <ChessBoard
           chessStateHistory={this.props.chessStateHistory}
           visualIndex={this.props.visualIndex}
@@ -205,7 +169,7 @@ class ChessGame extends React.Component {
           displayConfirmation={this.props.displayConfirmation}
           opponentName={this.props.opponentName}
           playerName={this.props.playerName}
-          onClick={(row, col) => this.handleClick(row, col)}
+          onClick={(row, col) => this.props.handleClick(row, col)}
           myColor={this.props.myColor}
         />
 
@@ -235,7 +199,7 @@ class ChessGame extends React.Component {
               disabled={!canConfirmMove}
               style={{margin: '0.4em 0.2em'}}
               bsStyle='primary'
-              onClick={() => this.props.actuallyMove(this.props)(false, this.props.chessStateHistory,
+              onClick={() => this.props.actuallyMove(false, this.props.chessStateHistory,
                 this.props.actualIndex)}>Confirm move
               </Button>
               : ''
@@ -252,7 +216,7 @@ class ChessGame extends React.Component {
             this.props.displayConfirmation
             ? <Button style={{margin: '0.4em 0.2em'}}
               bsStyle='warning'
-              onClick={() => this.props.actuallyMove(this.props)(true, this.props.chessStateHistory,
+              onClick={() => this.props.actuallyMove(true, this.props.chessStateHistory,
                 this.props.actualIndex)}>I'm sure
               </Button>
               : ''
