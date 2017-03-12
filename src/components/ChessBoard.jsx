@@ -374,8 +374,3 @@ export default class ChessBoard extends React.Component {
     )
   }
 }
-
-ChessBoard.propTypes = {
-  myColor: PropTypes.string
-
-}
