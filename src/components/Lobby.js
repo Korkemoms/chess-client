@@ -78,14 +78,21 @@ class Lobby extends React.Component {
     let playerTab =
       <Tab.Pane eventKey='players'>
         <PanelGroup activeKey={this.props.selectedPlayerId} accordion >
-          {this.props.players.map((player, index) =>
-            <Panel
-              header={player.name}
-              key={index}
-              eventKey={player.id}
-              onClick={() => this.props.selectPlayer(player)}>
-              {challengeButton}
-            </Panel>
+          {this.props.players.map((player, index) => {
+            let boldPlayerName = player.email === this.props.myEmail
+            let headerText = boldPlayerName
+            ? <strong>{player.name}</strong>
+            : player.name
+            return (
+              <Panel
+                header={headerText}
+                key={index}
+                eventKey={player.id}
+                onClick={() => this.props.selectPlayer(player)}>
+                {challengeButton}
+              </Panel>
+            )
+          }
           )}
         </PanelGroup>
 
@@ -109,8 +116,21 @@ class Lobby extends React.Component {
                       ? 'Show game' : 'Spectate'}
               </Button>
 
+            let boldChallengerName = chessGame.challengerEmail === this.props.myEmail
+            let boldOpponentName = chessGame.opponentEmail === this.props.myEmail
+
+            let challengerName = boldChallengerName
+              ? <strong>{chessGame.challengerName}</strong>
+              : chessGame.challengerName
+
+            let opponentName = boldOpponentName
+              ? <strong>{chessGame.opponentName}</strong>
+              : chessGame.opponentName
+
+            let headerText = <div>{challengerName}{' vs '}{opponentName}</div>
+
             return (<Panel
-              header={`${chessGame.challengerName} vs ${chessGame.opponentName}`}
+              header={headerText}
               key={index}
               eventKey={chessGame.id}
               onClick={() => this.props.expandGame(chessGame)}
@@ -173,6 +193,5 @@ class Lobby extends React.Component {
     )
   }
 }
-
 
 export default Lobby
