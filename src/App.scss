@@ -1,0 +1,26 @@
+.Center-container{
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+@media screen and (max-width: 480px) {
+  #Game-well {
+    padding-left: 0;
+    padding-right: 0;
+    background: none;
+    border: 0;
+    box-shadow: none;
+  }
+}
+@media screen and (max-width: 480px) {
+  #Game-col {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
