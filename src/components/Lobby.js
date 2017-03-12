@@ -10,8 +10,11 @@ import {
   FormControl,
   Form,
   FormGroup,
+  PanelGroup,
   ListGroup,
-  ListGroupItem
+  ListGroupItem,
+  Panel,
+  PageHeader
 } from 'react-bootstrap'
 
 let fetched = 0
@@ -55,130 +58,121 @@ class Lobby extends React.Component {
       this.props.myEmail !== null &&
       this.props.myFetch !== null
 
-    let userInfo = loggedIn
-    ? <div>
-      <label>{'Username:'}</label>{' ' + this.props.myName}<br />
-      <label>{'Email:'}</label>{' ' + this.props.myEmail}
-    </div>
-    : <div><label>Log in to play against others</label></div>
+    if (!loggedIn) {
+      return <div><label>Log in to play against others</label></div>
+    }
 
-    let challengeButton = loggedIn
-    ? <Form inline>
-      <FormGroup controlId='formInlineName'>
-        <Button disabled={this.props.selectedPlayerId === null}
-          bsStyle='primary'
-          onClick={() => this.props.challengePlayer(
-            this.props.myFetch,
-            {email: this.props.myEmail, name: this.props.myName},
-            this.props.selectedPlayer)}>
-        Challenge</Button>
-      </FormGroup></Form>
-    : null
+    let header =
+      null
 
-    let playerTab = loggedIn
-    ? <Tab.Pane eventKey='players'>
-      <ListGroup>
-        {this.props.players.map((player, index) => {
-          let active = player.id === this.props.selectedPlayerId
-          return <ListGroupItem
-            header={active ? player.name : null}
+    let challengeButton =
+      <Button disabled={this.props.selectedPlayerId === null}
+        bsStyle='primary'
+        onClick={() => this.props.challengePlayer(
+      this.props.myFetch,
+      {email: this.props.myEmail, name: this.props.myName},
+      this.props.selectedPlayer)}>
+        Challenge
+      </Button>
 
-            key={index}
-            onClick={() => this.props.selectPlayer(player)}>
-            {active ? null : player.name}
-            {active ? challengeButton : null}
+    let playerTab =
+      <Tab.Pane eventKey='players'>
+        <PanelGroup activeKey={this.props.selectedPlayerId} accordion >
+          {this.props.players.map((player, index) =>
+            <Panel
+              header={player.name}
+              key={index}
+              eventKey={player.id}
+              onClick={() => this.props.selectPlayer(player)}>
+              {challengeButton}
+            </Panel>
+          )}
+        </PanelGroup>
 
-          </ListGroupItem>
-        })}
-      </ListGroup>
+      </Tab.Pane>
 
-    </Tab.Pane>
-    : null
+    let gamesTab =
+      <Tab.Pane eventKey='my-games'>
+        <PanelGroup activeKey={this.props.expandedGameId} accordion>
+          {this.props.chessGames.map((chessGame, index) => {
+            let showGameButton =
+              <Button
+                active={chessGame.id === this.props.selectedGameId}
+                bsStyle='primary'
+                onClick={() => {
+                  let moves = chessGame.id in this.props.chessMoves ?
+                  Object.values(this.props.chessMoves[chessGame.id]) : []
+                  this.props.selectGame(chessGame, moves)
+                }} >
+                {this.props.myEmail === chessGame.challengerEmail
+                      || this.props.myEmail === chessGame.opponentEmail
+                      ? 'Show game' : 'Spectate'}
+              </Button>
 
-    let gamesTab = loggedIn
-    ? <Tab.Pane eventKey='my-games'>
-      <ListGroup>
+            return (<Panel
+              header={`${chessGame.challengerName} vs ${chessGame.opponentName}`}
+              key={index}
+              eventKey={chessGame.id}
+              onClick={() => this.props.expandGame(chessGame)}
+                            >
+              {showGameButton}
+            </Panel>)
+          }
 
-        {this.props.chessGames.map((chessGame, index) =>
-          <ListGroupItem
-            active={chessGame.id === this.props.selectedGameId}
-            key={index}
-            onClick={() => {
-              let moves = chessGame.id in this.props.chessMoves ?
-              Object.values(this.props.chessMoves[chessGame.id]) : []
-              this.props.selectGame(chessGame, moves)
-            }}>
-            {`${chessGame.challengerName} vs ${chessGame.opponentName}`}
-          </ListGroupItem>
         )}
-      </ListGroup>
-    </Tab.Pane>
-    : null
+        </PanelGroup>
+      </Tab.Pane>
 
-    let chatTab = loggedIn
-    ? <Tab.Pane eventKey='chat'>
-      <ListGroup>
-        <ListGroupItem>Chat message</ListGroupItem>
-      </ListGroup>
-      <Form inline>
-        <FormGroup controlId='formInlineName'>
-          <FormControl disabled type='text' placeholder='Jane Doe' />
-          <Button disabled bsStyle='primary'>Send</Button>
-        </FormGroup>
-      </Form>
-    </Tab.Pane>
-    : null
+    let chatTab =
+      <Tab.Pane eventKey='chat'>
+        <ListGroup>
+          <ListGroupItem>Chat message</ListGroupItem>
+        </ListGroup>
+        <Form inline>
+          <FormGroup controlId='formInlineName'>
+            <FormControl disabled type='text' placeholder='Jane Doe' />
+            <Button disabled bsStyle='primary'>Send</Button>
+          </FormGroup>
+        </Form>
+      </Tab.Pane>
 
-    let tab = loggedIn
-    ? <Tab.Container defaultActiveKey={loggedIn ? 'players' : 'unknown-tab'} id='game-tab'>
-      <Row className='clearfix'>
-        <Col sm={12}>
-          <Nav bsStyle='pills'>
-            <NavItem disabled={!loggedIn} eventKey='chat'>
+    let tab =
+      <Tab.Container
+        defaultActiveKey={this.props.selectedTab}
+        id='game-tab'
+        onSelect={(tab) => { this.props.selectTab(tab) }}>
+        <Row className='clearfix'>
+          <Col sm={12}>
+            <Nav bsStyle='pills' style={{marginBottom: '5px'}}>
+              <NavItem disabled={!loggedIn} eventKey='chat'>
                     Messages
                 </NavItem>
-            <NavItem disabled={!loggedIn} eventKey='players'>
+              <NavItem disabled={!loggedIn} eventKey='players'>
                     Players
                 </NavItem>
-            <NavItem disabled={!loggedIn} eventKey='my-games'>
+              <NavItem disabled={!loggedIn} eventKey='my-games'>
                     Games
                 </NavItem>
-          </Nav>
-        </Col>
-        <Col sm={12}>
-          <Tab.Content animation>
-            {playerTab}
-            {gamesTab}
-            {chatTab}
-          </Tab.Content>
-        </Col>
-      </Row>
-    </Tab.Container>
-            : null
+            </Nav>
+          </Col>
+          <Col sm={12}>
+            <Tab.Content animation>
+              {playerTab}
+              {gamesTab}
+              {chatTab}
+            </Tab.Content>
+          </Col>
+        </Row>
+      </Tab.Container>
 
     return (
       <div>
-        {userInfo}
+        {header}
         {tab}
       </div>
     )
   }
 }
 
-Lobby.propTypes = {
-  jwToken: PropTypes.string,
-  selectedPlayerName: PropTypes.string,
-  selectedPlayerEmail: PropTypes.string,
-  updateIndex: PropTypes.number,
-  selectPlayer: PropTypes.func,
-  challengePlayer: PropTypes.func,
-  myEmail: PropTypes.string,
-  myName: PropTypes.string,
-  myFetch: PropTypes.func,
-  players: PropTypes.array,
-  chessGames: PropTypes.array,
-  fetchUpdates: PropTypes.func,
-  selectedId: PropTypes.string
-}
 
 export default Lobby
