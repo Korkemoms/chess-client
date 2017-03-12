@@ -8,41 +8,41 @@ export const setFocus = (focusRow, focusCol) => {
   }
 }
 
-export const setVisualIndex = (index) => {
+export const setVisualIndex = index => {
   return {
     type: 'SET_VISUAL_INDEX',
     visualIndex: index
   }
 }
 
-export const _sendMove = (move) => {
+export const _sendMove = move => {
   return {
     type: 'SEND_MOVE',
     move: move
   }
 }
 
-export const setActualIndex = (index) => {
+export const setActualIndex = index => {
   return {
     type: 'SET_ACTUAL_INDEX',
     actualIndex: index
   }
 }
 
-export const setDisplayConfirmation = (displayConfirmation) => {
+export const setDisplayConfirmation = displayConfirmation => {
   return {
     type: 'SET_DISPLAY_CONFIRMATION',
     displayConfirmation: displayConfirmation
   }
 }
 
-export const setChessStateHistory = (chessStateHistory) => {
+export const setChessStateHistory = chessStateHistory => {
   return {
     type: 'SET_CHESS_STATE_HISTORY',
     chessStateHistory: chessStateHistory
   }
 }
-export const sendMovesFailed = (message) => {
+export const sendMovesFailed = message => {
   return {
     type: 'SEND_MOVES_FAILED',
     message: message
@@ -54,68 +54,71 @@ export const clearChessGame = () => {
   }
 }
 
-export const actuallyMove = props => confirmed => dispatch => {
+export const actuallyMove = confirmed => (dispatch, getState) => {
+  let state = getState().chessGame
   if (confirmed) {
-    const chessState = props.chessStateHistory[props.actualIndex + 1]
+    const chessState = state.chessStateHistory[state.actualIndex + 1]
     const lastMove = chessState.moves[chessState.moves.length - 1].copy()
 
-    let visualIndex = props.actualIndex + 1
+    let visualIndex = state.actualIndex + 1
 
     dispatch(setDisplayConfirmation(false))
     dispatch(setActualIndex(visualIndex))
     dispatch(setVisualIndex(visualIndex))
 
     let move = {
-      chessGameId: props.gameId,
+      chessGameId: state.gameId,
       ...lastMove
     }
 
-    dispatch(sendMove(props.myFetch, move))
+    dispatch(sendMove(move))
   } else {
     dispatch(setDisplayConfirmation(true))
   }
 }
 
-export const handleClick = props => (row, col) => dispatch => {
+export const handleClick = (row, col) => (dispatch, getState) => {
   // gather some info
 
-  const visualIndex = props.visualIndex
-  const chessState = props.chessStateHistory[visualIndex]
-  const focusRow = props.focusRow
-  const focusCol = props.focusCol
+  let state = getState().chessGame
+
+  const visualIndex = state.visualIndex
+  const chessState = state.chessStateHistory[visualIndex]
+  const focusRow = state.focusRow
+  const focusCol = state.focusCol
   const gotFocus = focusRow !== -1 && focusCol !== -1
-  const haveOpponent = props.opponentName !== null
-  const future = props.visualIndex >= props.actualIndex
+  const haveOpponent = state.opponentName !== null
+  const future = state.visualIndex >= state.actualIndex
 
   // determine what to do
   const focusPiece = gotFocus ? chessState.getPiece(focusRow, focusCol) : null
   const clickedPiece = chessState.getPiece(row, col)
   const focusColor = focusPiece !== null ? focusPiece.color : ''
 
-  let setFocus = !clickedPiece.isEmpty() && !gotFocus &&
+  let shouldSetFocus = !clickedPiece.isEmpty() && !gotFocus &&
   clickedPiece.color === chessState.whoseTurn && future
-  let unFocus = gotFocus && focusRow === row &&
+  let shouldUnFocus = gotFocus && focusRow === row &&
     focusCol === col && future
-  let move = focusColor === chessState.whoseTurn && gotFocus &&
+  let shouldMove = focusColor === chessState.whoseTurn && gotFocus &&
     chessState.canMove(focusRow, focusCol, row, col) && haveOpponent && future
 
   // do it
-  if (setFocus) { // lift up the piece
-    const newHistory = props.chessStateHistory.slice()
+  if (shouldSetFocus) { // lift up the piece
+    const newHistory = state.chessStateHistory.slice()
 
-    props.setChessStateHistory(newHistory)
-    props.setFocus(row, col)
-  } else if (unFocus) { // put the piece back
-    const newHistory = props.chessStateHistory.slice()
+    dispatch(setChessStateHistory(newHistory))
+    dispatch(setFocus(row, col))
+  } else if (shouldUnFocus) { // put the piece back
+    const newHistory = state.chessStateHistory.slice()
 
-    props.setChessStateHistory(newHistory)
-    props.setFocus(-1, -1)
-  } else if (move) { // move the piece
+    dispatch(setChessStateHistory(newHistory))
+    dispatch(setFocus(-1, -1))
+  } else if (shouldMove) { // move the piece
     let lastMoveNumber = chessState.moves.length > 0
     ? chessState.moves[chessState.moves.length - 1].number : 0
 
-    props.move(focusRow, focusCol, row, col, lastMoveNumber + 1,
-      false, props.actualIndex, props.visualIndex, props.chessStateHistory)
+    dispatch(move(focusRow, focusCol, row, col, lastMoveNumber + 1,
+      false, state.actualIndex, state.visualIndex, state.chessStateHistory))
   }
 }
 
@@ -125,7 +128,6 @@ export const handleClick = props => (row, col) => dispatch => {
  * @returns the chess state after the moves
  */
 export const initWithMoves = (moves, actual) => dispatch => {
-  console.log(moves)
   if (moves.length === 0) return
 
   let index = 0
@@ -165,16 +167,19 @@ export const initWithMoves = (moves, actual) => dispatch => {
  * @param moves
  * @returns the chess state after the moves
  */
-export const moveMany = props => (moves, actual) => dispatch => {
-  console.log(moves)
+export const moveMany = (moves, actual) => (dispatch, getState) => {
   if (moves.length === 0) return
 
-  let index = actual ? props.actualIndex : props.visualIndex
-  let chessState = props.chessStateHistory[index]
-  const newHistory = chessStateHistory.slice()
+  let state = getState().chessGame
+
+  let index = actual ? state.actualIndex : state.visualIndex
+  let chessState = state.chessStateHistory[index]
+  const newHistory = state.chessStateHistory.slice()
 
   let lastMoveNumber = chessState.moves.length > 0
   ? chessState.moves[chessState.moves.length - 1].number : 0
+
+  moves = moves.sort((a, b) => a.number - b.number)
 
   moves.forEach(function (move) {
     let number = Number(move.number)
@@ -198,19 +203,20 @@ export const moveMany = props => (moves, actual) => dispatch => {
   return chessState
 }
 
-// TODO clean
 /**
  * Move one piece
  * @param number move number, to avoid performing the same move twice.
  * @param actual whether to actually move the piece
  * @returns state the chess state after the moves
  */
-export const move = props => (fromRow, fromCol, toRow, toCol, number,
-  actual) => dispatch => {
+export const move = (fromRow, fromCol, toRow, toCol, number,
+  actual) => (dispatch, getState) => {
+    let state = getState().chessGame
+
     number = Number(number)
 
-    const index = actual ? props.actualIndex : props.visualIndex
-    const chessState = props.chessStateHistory[index]
+    const index = actual ? state.actualIndex : state.visualIndex
+    const chessState = state.chessStateHistory[index]
 
     let lastMoveNumber = chessState.moves.length > 0
     ? chessState.moves[chessState.moves.length - 1].number : 0
@@ -222,13 +228,13 @@ export const move = props => (fromRow, fromCol, toRow, toCol, number,
 
     const newRuleState = chessState.move(fromRow, fromCol, toRow, toCol)
 
-    const newHistory = props.chessStateHistory.slice(0, index + 1)
+    const newHistory = state.chessStateHistory.slice(0, index + 1)
     newHistory.push(newRuleState)
 
     dispatch(setChessStateHistory(newHistory))
     dispatch(setVisualIndex(index + 1))
     if (actual) {
-      dispatch(setActualIndex(props.actualIndex + 1))
+      dispatch(setActualIndex(state.actualIndex + 1))
     }
 
     dispatch(setFocus(-1, -1))
@@ -236,7 +242,7 @@ export const move = props => (fromRow, fromCol, toRow, toCol, number,
     return newRuleState
   }
 
-export const sendMove = (myFetch, move) => dispatch => {
+export const sendMove = (move) => (dispatch, getState) => {
   dispatch(_sendMove(move))
 
   var form = new FormData()
@@ -248,7 +254,7 @@ export const sendMove = (myFetch, move) => dispatch => {
   form.append('number', move.number)
   form.append('chess_game_id', move.chessGameId)
 
-  return myFetch('/chess-moves', {
+  return getState().chessGame.myFetch('/chess-moves', {
     method: 'POST',
     body: form
   })
