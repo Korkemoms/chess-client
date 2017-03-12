@@ -17,36 +17,28 @@ import {
   PageHeader
 } from 'react-bootstrap'
 
-let fetched = 0
+let lastFetch = 0
 
 class Lobby extends React.Component {
 
   componentWillMount () {
     let _this = this
     this.intervalId = setInterval(() => {
+      let time = new Date().getTime()
+      if (time - lastFetch < 3000) {
+        return
+      }
+
       let props = _this.props
       let loggedIn = props.myName !== null &&
-        props.myEmail !== null &&
-        props.myFetch !== null
-      if (loggedIn) {
-        props.fetchUpdates(props.myFetch, props.updateIndex)
+        props.myEmail !== null && props.myFetch !== null
+      if (!loggedIn) {
+        return
       }
-    }, 3000)
-  }
 
-  componentWillUpdate (nextProps) {
-    if (this.once) {
-      return
-    }
-    this.once = true
-
-    let loggedIn = nextProps.myName !== null &&
-      nextProps.myEmail !== null &&
-      nextProps.myFetch !== null
-
-    if (loggedIn) {
-      this.props.fetchUpdates(nextProps.myFetch, nextProps.updateIndex)
-    }
+      lastFetch = time
+      props.fetchUpdates(props.myFetch, props.updateIndex)
+    }, 100)
   }
 
   componentWillUnmount () {
@@ -59,11 +51,13 @@ class Lobby extends React.Component {
       this.props.myFetch !== null
 
     if (!loggedIn) {
-      return <div><label>Log in to play against others</label></div>
+      return <div style={{textAlign: 'center'}}>
+        <h3>You must log in to play</h3>
+        <Button bsStyle='success' onClick={() => this.props.navigate('/login')}>Log in</Button>
+      </div>
     }
 
-    let header =
-      null
+    let header = null
 
     let challengeButton =
       <Button disabled={this.props.selectedPlayerId === null}
