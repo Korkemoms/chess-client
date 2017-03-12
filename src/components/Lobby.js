@@ -25,7 +25,7 @@ class Lobby extends React.Component {
     let _this = this
     this.intervalId = setInterval(() => {
       let time = new Date().getTime()
-      if (time - lastFetch < 3000) {
+      if (time - lastFetch < 6000) {
         return
       }
 
@@ -51,7 +51,7 @@ class Lobby extends React.Component {
       this.props.myFetch !== null
 
     if (!loggedIn) {
-      return <div style={{textAlign: 'center'}}>
+      return <div style={{  position: 'relative',zIndex: '10',textAlign: 'center'}}>
         <h3>You must log in to play</h3>
         <Button bsStyle='success' onClick={() => this.props.navigate('/login')}>Log in</Button>
       </div>
