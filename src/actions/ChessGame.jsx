@@ -140,6 +140,8 @@ export const initWithMoves = (moves, actual) => dispatch => {
   let lastMoveNumber = chessState.moves.length > 0
   ? chessState.moves[chessState.moves.length - 1].number : 0
 
+  moves = moves.sort((a, b) => a.number - b.number)
+
   moves.forEach(function (move) {
     let number = Number(move.number)
     if (number === lastMoveNumber + 1) {
