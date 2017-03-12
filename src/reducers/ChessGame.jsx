@@ -65,6 +65,45 @@ const update = (state = chessGameInitialState, action) => {
       })
     }
 
+    case 'RECEIVE_CHESS_GAMES': {
+      let current = state // its not copied!
+
+      let received
+      Object.values(action.chessGames).forEach(game => {
+        if (game.id === current.gameId) {
+          received = game
+        }
+      })
+
+      if (!received) {
+        return Object.assign({}, state)
+      }
+
+      let imChallenger = received.challengerEmail === state.myEmail
+
+      let playerName = !imChallenger ? received.opponentName
+      : received.challengerName
+      let playerEmail = !imChallenger ? received.opponentEmail
+      : received.challengerEmail
+
+      let opponentName = imChallenger ? received.opponentName
+      : received.challengerName
+      let opponentEmail = imChallenger ? received.opponentEmail
+      : received.challengerEmail
+
+      let spectator = opponentEmail !== state.myEmail && playerEmail !== state.myEmail
+
+      return Object.assign({}, state, {
+        playerName: playerName,
+        playerEmail: playerEmail,
+        opponentName: opponentName,
+        opponentEmail: opponentEmail,
+        displayConfirmation: false,
+        myColor: imChallenger ? 'White' : 'Black',
+        spectator: spectator
+      })
+    }
+
     case 'SELECT_GAME': {
       let imChallenger = action.selectedGame.challengerEmail === state.myEmail
 
