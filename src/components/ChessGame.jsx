@@ -249,17 +249,4 @@ class ChessGame extends React.Component {
   }
 }
 
-ChessGame.propTypes = {
-  focusRow: PropTypes.number.isRequired,
-  focusCol: PropTypes.number.isRequired,
-  visualIndex: PropTypes.number.isRequired,
-  actualIndex: PropTypes.number.isRequired,
-  displayConfirmation: PropTypes.bool.isRequired,
-  pieceMoved: PropTypes.func,
-  opponentName: PropTypes.string.isRequired,
-  playerName: PropTypes.string.isRequired,
-  myColor: PropTypes.string,
-  spectator: PropTypes.bool
-}
-
 export default ChessGame
