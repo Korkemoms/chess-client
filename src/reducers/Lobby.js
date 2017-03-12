@@ -7,7 +7,9 @@ export const lobbyInitialState = {
   myName: null,
   myFetch: null,
   selectedPlayerId: null,
-  selectedGameId: localStorage.getItem('selectedGameId')
+  selectedGameId: null,
+  expandedGameId: null,
+  selectedTab: 'players'
 }
 
 export default function update (state = lobbyInitialState, action) {
@@ -34,6 +36,12 @@ export default function update (state = lobbyInitialState, action) {
       return Object.assign({}, state, {
         players: players,
         updateIndex: updateIndex // if there is change the update index will change
+      })
+    }
+
+    case 'SELECT_TAB' : {
+      return Object.assign({}, state, {
+        selectedTab: action.tab
       })
     }
 
@@ -67,10 +75,10 @@ export default function update (state = lobbyInitialState, action) {
       // store the moves in one object per chess game
       let updateIndex = state.updateIndex
       action.chessMoves.forEach(chessMove => {
-        if (!(chessMove.chessGameId.toString() in local)) {
-          local[chessMove.chessGameId.toString()] = {}
+        if (!(chessMove.chessGameId in local)) {
+          local[chessMove.chessGameId] = {}
         }
-        local[chessMove.chessGameId.toString()][chessMove.id] = chessMove
+        local[chessMove.chessGameId][chessMove.id] = chessMove
 
         if (chessMove.updateIndex > updateIndex) {
           updateIndex = chessMove.updateIndex
@@ -88,12 +96,16 @@ export default function update (state = lobbyInitialState, action) {
         selectedPlayerId: action.selectedPlayer.id,
         selectedPlayer: action.selectedPlayer
       })
-    case 'SELECT_GAME': {
-      localStorage.setItem('selectedGameId', action.selectedGameId)
+    case 'EXPAND_GAME':
       return Object.assign({}, state, {
-        selectedGameId: action.selectedGame.id
+        expandedGameId: action.expandedGame.id,
+        expandedGame: action.expandedGame
       })
-    }
+    case 'SELECT_GAME':
+      return Object.assign({}, state, {
+        selectedGameId: action.selectedGame.id,
+        selectedGame: action.selectedGame
+      })
 
     case 'APP_RECEIVE_PROPS': {
       return Object.assign({}, state, {
