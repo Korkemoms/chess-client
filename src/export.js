@@ -2,6 +2,7 @@
 import React, { PropTypes } from 'react'
 import ChessGame from './containers/ChessGame'
 import Lobby from './containers/Lobby'
+import './App.scss'
 
 import { createStore, applyMiddleware, combineReducers } from 'redux'
 import { Provider } from 'react-redux'
@@ -14,7 +15,9 @@ import createLogger from 'redux-logger'
 import {
   Grid,
   Row,
-  Col
+  Col,
+  Well,
+  Panel
 } from 'react-bootstrap'
 
 const reducer = combineReducers({
@@ -22,16 +25,10 @@ const reducer = combineReducers({
   lobby: lobbyReducer
 })
 
-const initialState = {
-  chessGame: chessGameInitialState,
-  lobby: lobbyInitialState
-}
-
 const loggerMiddleware = createLogger()
 
 const store = createStore(
   reducer,
-  initialState,
   applyMiddleware(
       thunkMiddleware, // lets us dispatch() functions
       loggerMiddleware // neat middleware that logs actions
@@ -47,8 +44,6 @@ export default class Chess extends React.Component {
         props: props
       }
     }
-
-    console.log(this.props)
 
     store.dispatch(receiveProps(this.props))
   }
@@ -72,8 +67,10 @@ export default class Chess extends React.Component {
             <Col sm={12} md={6}>
               <Lobby />
             </Col>
-            <Col sm={12} md={6}>
-              <ChessGame />
+            <Col sm={12} md={6} id='Game-col'>
+              <Well id='Game-well' className='Center-container'>
+                <ChessGame />
+              </Well>
             </Col>
 
           </Row>
