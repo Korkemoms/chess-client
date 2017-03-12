@@ -1,4 +1,8 @@
-import { moveMany, clearChessGame, initWithMoves } from './ChessGame'
+import {
+  moveMany,
+  clearChessGame,
+  initWithMoves
+} from './ChessGame'
 import ChessRules from '../components/ChessRules'
 
 export const receivePlayers = players => {
@@ -14,8 +18,7 @@ export const receiveChessGames = chessGames => {
     chessGames: chessGames.slice()
   }
 }
-
-export const receiveChessMoves = chessMoves => {
+export const _receiveChessMoves = chessMoves => {
   return {
     type: 'RECEIVE_CHESS_MOVES',
     chessMoves: chessMoves.slice()
@@ -41,6 +44,14 @@ export const _selectGame = (game, moves) => {
     type: 'SELECT_GAME',
     selectedGame: game,
     moves: moves
+  }
+}
+
+export const expandGame = (game) => {
+  return {
+    type: 'EXPAND_GAME',
+    expandedGameId: game.id,
+    expandedGame: game
   }
 }
 
@@ -72,13 +83,17 @@ export const requestUpdates = updateIndex => {
   }
 }
 
+export const selectTab = tab => {
+  return {
+    type: 'SELECT_TAB',
+    tab: tab
+  }
+}
+
 export const selectGame = (game, moves) => dispatch => {
   dispatch(clearChessGame())
-
   dispatch(_selectGame(game, moves))
-
-
-      dispatch(initWithMoves(moves, true))
+  dispatch(initWithMoves(moves, true))
 }
 
 export const challengePlayer = (myFetch, me, player) => dispatch => {
@@ -100,9 +115,9 @@ export const challengePlayer = (myFetch, me, player) => dispatch => {
     })
 }
 
-export const fetchUpdates = (myFetch, updateIndex) => dispatch => {
+export const fetchUpdates = (myFetch, updateIndex) => (dispatch, getState) => {
     // dispatch(requestUpdates(updateIndex))
-
+  let state = getState().lobby
     // dont need the players if no change since last time
   let headers = new Headers()
   headers.append('update-index', updateIndex)
@@ -118,7 +133,16 @@ export const fetchUpdates = (myFetch, updateIndex) => dispatch => {
       dispatch(receiveChessGames(json.chessGames.data))
     }
     if (json.chessMoves.data.length > 0) {
-      dispatch(receiveChessMoves(json.chessMoves.data))
+      dispatch(_receiveChessMoves(json.chessMoves.data))
+
+      let movesForSelectedGame = []
+      Object.values(json.chessMoves.data).forEach(move => {
+        if (move.chessGameId === state.selectedGameId) {
+          movesForSelectedGame.push(move)
+        }
+      })
+
+      dispatch(moveMany(movesForSelectedGame, true))
     }
   })
     .catch(error => { // handle errors
