@@ -111,7 +111,7 @@ export const challengePlayer = (myFetch, me, player) => dispatch => {
     body: form
   })
   .catch(error => { // handle errors
-      dispatch(challengePlayerFailed('Something went wrong: ' + error))
+    dispatch(challengePlayerFailed('Something went wrong: ' + error))
   })
 }
 
