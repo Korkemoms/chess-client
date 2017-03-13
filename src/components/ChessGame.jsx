@@ -1,12 +1,10 @@
 /**
- * Stateless chess game.
- *
  * Andreas Modahl
  */
 
 import '../Chess.scss'
 import ChessBoard from './ChessBoard.jsx'
-import React, { PropTypes } from 'react'
+import React from 'react'
 
 import Slider from 'rc-slider'
 import 'rc-slider/assets/index.css'

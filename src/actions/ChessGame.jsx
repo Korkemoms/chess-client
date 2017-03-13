@@ -96,9 +96,11 @@ export const handleClick = (row, col) => (dispatch, getState) => {
   const focusColor = focusPiece !== null ? focusPiece.color : ''
 
   let shouldSetFocus = !clickedPiece.isEmpty() && !gotFocus &&
-  clickedPiece.color === chessState.whoseTurn && future
+    clickedPiece.color === chessState.whoseTurn && future
+
   let shouldUnFocus = gotFocus && focusRow === row &&
     focusCol === col && future
+
   let shouldMove = focusColor === chessState.whoseTurn && gotFocus &&
     chessState.canMove(focusRow, focusCol, row, col) && haveOpponent && future
 

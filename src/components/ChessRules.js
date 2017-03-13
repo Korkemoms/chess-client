@@ -69,7 +69,7 @@ export default class ChessRules {
       }
     }
 
-        // Black pieces
+    // Black pieces
     let row = 0,
       col = 0
     this.pieces[col++ + row * 8] = new Piece(b_rook, 'Black', 0)
@@ -87,7 +87,7 @@ export default class ChessRules {
       this.pieces[col++ + row * 8] = new Piece(b_pawn, 'Black', 0)
     }
 
-        // White pieces
+    // White pieces
     row = 7
     col = 0
     this.pieces[col++ + row * 8] = new Piece(w_rook, 'White', 0)
@@ -116,21 +116,21 @@ export default class ChessRules {
     }
     gameState.pieces = copyPositions
 
-        // copy dead pieces
+    // copy dead pieces
     const copyDeadPieces = []
     for (let i = 0; i < this.deadPieces.length; i++) {
       copyDeadPieces.push(this.deadPieces[i].copy())
     }
     gameState.deadPieces = copyDeadPieces
 
-        // copy move history
+    // copy move history
     const copyMoves = []
     for (let i = 0; i < this.moves.length; i++) {
       copyMoves.push(this.moves[i].copy())
     }
     gameState.moves = copyMoves
 
-        // copy other stuff
+    // copy other stuff
     gameState.whoseTurn = this.whoseTurn
 
     return gameState
@@ -153,8 +153,8 @@ export default class ChessRules {
     return this.pieces[col + row * 8]
   }
 
-    // move a piece, returns a new ChessRules
-    // assumes it is a valid move, see canMove(row,col,targetRow,targetCol)
+  // move a piece, returns a new ChessRules
+  // assumes it is a valid move, see canMove(row,col,targetRow,targetCol)
   move (row, col, targetRow, targetCol) {
     row = Number(row)
     col = Number(col)
@@ -172,17 +172,17 @@ export default class ChessRules {
       newState.deadPieces.push(targetPiece.copy())
     }
 
-        // record the move
+    // record the move
     newState.moves.push(new Move(row, col, targetRow, targetCol, newState.moves.length + 1))
 
-        // 'move' the piece
+    // 'move' the piece
     newState.pieces[targetCol + targetRow * 8] = this.pieces[col + row * 8].copy()
     newState.pieces[col + row * 8] = emptyPiece.copy()
     if (enPassant) {
       newState.pieces[targetCol + killedPieceRow * 8] = emptyPiece.copy()
     }
     if (castling) {
-            // move rook over king
+      // move rook over king
       if (targetCol === 6) {
         newState.pieces[5 + targetRow * 8] = newState.pieces[7 + targetRow * 8].copy()
         newState.pieces[7 + targetRow * 8] = emptyPiece.copy()
@@ -193,7 +193,7 @@ export default class ChessRules {
       }
     }
 
-        // upgrade pawns that make it across
+    // upgrade pawns that make it across
     const unicode = newState.pieces[targetCol + targetRow * 8].unicode
     if (unicode === w_pawn && targetRow === 0) {
       newState.pieces[targetCol + targetRow * 8].unicode = w_queen
@@ -201,7 +201,7 @@ export default class ChessRules {
       newState.pieces[targetCol + targetRow * 8].unicode = b_queen
     }
 
-        // record how many times it has been moved
+    // record how many times it has been moved
     newState.pieces[targetCol + targetRow * 8].moves++
 
     newState.whoseTurn = newState.whoseTurn === 'White' ? 'Black' : 'White'
@@ -209,9 +209,9 @@ export default class ChessRules {
     return newState
   }
 
-    // move a piece, returns a new ChessRules
-    // does not account for special behavior (en passant and castling)
-    // assumes it is a valid move otherwise, see canMove(row,col,targetRow,targetCol)
+  // move a piece, returns a new ChessRules
+  // does not account for special behavior (en passant and castling)
+  // assumes it is a valid move otherwise, see canMove(row,col,targetRow,targetCol)
   basicMove (row, col, targetRow, targetCol) {
     const newState = this.copy()
 
@@ -221,14 +221,14 @@ export default class ChessRules {
       newState.deadPieces.push(targetPiece.copy())
     }
 
-        // record the move
+    // record the move
     newState.moves.push(new Move(row, col, targetRow, targetCol, newState.moves.length + 1))
 
-        // 'move' the piece
+    // 'move' the piece
     newState.pieces[targetCol + targetRow * 8] = this.pieces[col + row * 8].copy()
     newState.pieces[col + row * 8] = emptyPiece.copy()
 
-        // record how many times it has been moved
+    // record how many times it has been moved
     newState.pieces[targetCol + targetRow * 8].moves++
 
     newState.whoseTurn = newState.whoseTurn === 'White' ? 'Black' : 'White'
@@ -236,9 +236,9 @@ export default class ChessRules {
     return newState
   }
 
-    // whether Black king is in check
+  // whether Black king is in check
   blackCheck () {
-        // determine where Black king is
+    // determine where Black king is
     let BlackKingRow = 0,
       BlackKingCol = 0
 
@@ -252,7 +252,7 @@ export default class ChessRules {
       }
     }
 
-        // see if any enemy is attacking the king
+    // see if any enemy is attacking the king
     for (let row = 0; row < 8; row++) {
       for (let col = 0; col < 8; col++) {
         const thisPiece = this.pieces[col + row * 8]
@@ -266,9 +266,9 @@ export default class ChessRules {
     return false
   }
 
-    // whether White king is in check
+  // whether White king is in check
   whiteCheck () {
-        // determine where White king is
+    // determine where White king is
     let WhiteKingRow = 0,
       WhiteKingCol = 0
 
@@ -282,7 +282,7 @@ export default class ChessRules {
       }
     }
 
-        // see if any enemy is attacking the king
+    // see if any enemy is attacking the king
     for (let row = 0; row < 8; row++) {
       for (let col = 0; col < 8; col++) {
         const thisPiece = this.pieces[col + row * 8]
@@ -296,7 +296,7 @@ export default class ChessRules {
     return false
   }
 
-    // also covers check, en passant and castling
+  // also covers check, en passant and castling
   canMove (row, col, targetRow, targetCol) {
     if (row < 0 || row > 7) throw new Error('Illegal row: ' + row)
     if (col < 0 || col > 7) throw new Error('Illegal column: ' + col)
@@ -312,10 +312,10 @@ export default class ChessRules {
     const canCastling = this.canCastling(row, col, targetRow, targetCol)
     if (!basicCanMove && !canEnPassant && !canCastling) return false
 
-        // copy state
+    // copy state
     const stateCopy = this.copy()
 
-        // update the copied state
+    // update the copied state
     stateCopy.pieces[targetCol + targetRow * 8] = piece.copy()
     stateCopy.pieces[col + row * 8] = emptyPiece.copy()
 
@@ -342,18 +342,18 @@ export default class ChessRules {
       if (piece.color !== state.whoseTurn) return false // must be my turn
       if (targetPiece.color !== piece.color) return false // target must be on my own team
 
-            // Must be king and rook
+      // Must be king and rook
       let correctPieces = piece.unicode === w_rook && targetPiece.unicode === w_king
       correctPieces |= piece.unicode === w_king && targetPiece.unicode === w_rook
       correctPieces |= piece.unicode === b_rook && targetPiece.unicode === b_king
       correctPieces |= piece.unicode === b_king && targetPiece.unicode === b_rook
       if (!correctPieces) return false
 
-            // The king and rook involved in castling must not have previously moved
+      // The king and rook involved in castling must not have previously moved
       if (piece.moves !== 0 || targetPiece.moves !== 0) return false
       if (row !== targetRow) return false // redundant
 
-            // There must be no pieces between the king and the rook
+      // There must be no pieces between the king and the rook
       let leftCol = col < targetCol ? col : targetCol
       let rightCol = col > targetCol ? col : targetCol
       for (let i = leftCol + 1; i < rightCol; i++) {
@@ -368,8 +368,8 @@ export default class ChessRules {
       const rookColumn = state.pieces[col + row * 8] === rook ? col : targetCol
       const kingDir = (kingColumn <= col && kingColumn <= targetCol) ? 1 : -1 // 1 right -1 left
 
-            // The king may not currently be in check, nor may the king pass through or end up in a square that is under attack by an enemy piece
-            // (though the rook is permitted to be under attack and to pass over an attacked square)
+      // The king may not currently be in check, nor may the king pass through or end up in a square that is under attack by an enemy piece
+      // (though the rook is permitted to be under attack and to pass over an attacked square)
       if (king.unicode === w_king && state.whiteCheck()) return false
       if (king.unicode === b_king && state.blackCheck()) return false
       for (let i = kingColumn + kingDir; i !== rookColumn; i += kingDir) {
@@ -419,7 +419,7 @@ export default class ChessRules {
         rightCheck
 
       if (unicode === w_pawn) {
-                // check for 'En passant' (white is bottom)
+        // check for 'En passant' (white is bottom)
         const rowCheck = targetRow === row - 1
         rightCheck = targetCol === col + 1
                     && state.pieces[targetCol + row * 8].unicode === b_pawn
@@ -434,7 +434,7 @@ export default class ChessRules {
         if (rowCheck && (leftCheck || rightCheck)) return true
       }
       if (unicode === b_pawn) {
-                // check for 'En passant' (white is bottom)
+        // check for 'En passant' (white is bottom)
         const rowCheck = targetRow === row + 1
         rightCheck = targetCol === col + 1
                     && state.pieces[targetCol + row * 8].unicode === w_pawn
@@ -458,7 +458,7 @@ export default class ChessRules {
     return false
   }
 
-    // only covers basic movements, does care whose turn it is
+  // only covers basic movements, does care whose turn it is
   basicCanMove (row, col, targetRow, targetCol) {
     if (row < 0 || row > 7) throw new Error('Illegal row: ' + row)
     if (col < 0 || col > 7) throw new Error('Illegal column: ' + col)
@@ -497,7 +497,7 @@ export default class ChessRules {
       if (pawnRules(this, unicode)) return true
     }
 
-        // rook rules
+    // rook rules
     function rookRules (state, unicode) {
       let freePath
 
@@ -534,7 +534,7 @@ export default class ChessRules {
       if (rookRules(this, unicode)) return true
     }
 
-        // knight rules
+    // knight rules
     function knightRules (state, unicode) {
       let onPath = Math.abs(row - targetRow) === 2 && Math.abs(col - targetCol) === 1
       onPath |= Math.abs(row - targetRow) === 1 && Math.abs(col - targetCol) === 2
@@ -545,9 +545,9 @@ export default class ChessRules {
       if (knightRules(this, unicode)) return true
     }
 
-        // bishop rules
+    // bishop rules
     function bishopRules (state, unicode) {
-            // determine if on diagonal path
+      // determine if on diagonal path
       let aligned = false,
         _row = row, _col = col,
         vDirection = targetRow - row > 0 ? 1 : -1,
@@ -561,7 +561,7 @@ export default class ChessRules {
         }
       }
 
-            // determine if path is free
+      // determine if path is free
       let freePath = true
       if (aligned) {
         _row = row
@@ -589,7 +589,7 @@ export default class ChessRules {
       if (bishopRules(this, unicode)) return true
     }
 
-        // queen rules
+    // queen rules
     function queenRules (state, unicode) {
       return bishopRules(state, unicode) || rookRules(state, unicode)
     }
@@ -598,7 +598,7 @@ export default class ChessRules {
       if (queenRules(this, unicode)) return true
     }
 
-        // king rules
+    // king rules
     function kingRules (state, unicode) {
       let hDistance = Math.abs(col - targetCol)
       let vDistance = Math.abs(row - targetRow)
