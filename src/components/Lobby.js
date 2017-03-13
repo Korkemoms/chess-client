@@ -162,7 +162,7 @@ class Lobby extends React.Component {
 
   gamesTab () {
     return (
-      <Tab.Pane eventKey='my-games'>
+      <Tab.Pane eventKey='games'>
         <PanelGroup activeKey={this.props.expandedGameId} accordion>
           {this.props.chessGames.map((chessGame, index) => {
             let showGameButton =
@@ -257,7 +257,7 @@ class Lobby extends React.Component {
               <NavItem disabled={!loggedIn} eventKey='players'>
                     Players
                 </NavItem>
-              <NavItem disabled={!loggedIn} eventKey='my-games'>
+              <NavItem disabled={!loggedIn} eventKey='games'>
                     Games
                 </NavItem>
             </Nav>
