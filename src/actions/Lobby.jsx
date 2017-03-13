@@ -110,9 +110,9 @@ export const challengePlayer = (myFetch, me, player) => dispatch => {
     method: 'POST',
     body: form
   })
-    .catch(error => { // handle errors
+  .catch(error => { // handle errors
       dispatch(challengePlayerFailed('Something went wrong: ' + error))
-    })
+  })
 }
 
 export const fetchUpdates = (myFetch, updateIndex) => (dispatch, getState) => {
