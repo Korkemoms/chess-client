@@ -91,11 +91,18 @@ export default function update (state = lobbyInitialState, action) {
       })
     }
 
-    case 'SELECT_PLAYER':
+    case 'SELECT_PLAYER': {
+      let previousSelectedPlayer = state.selectedPlayer
+      let previousSelectedPlayerId = state.selectedPlayerId
       return Object.assign({}, state, {
+        previousSelectedPlayer: previousSelectedPlayer,
+        previousSelectedPlayerId: previousSelectedPlayerId,
         selectedPlayerId: action.selectedPlayer.id,
         selectedPlayer: action.selectedPlayer
+
       })
+    }
+
     case 'EXPAND_GAME':
       return Object.assign({}, state, {
         expandedGameId: action.expandedGame.id,
