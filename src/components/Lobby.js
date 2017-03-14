@@ -101,6 +101,10 @@ class Lobby extends React.Component {
             let moves = game.id in this.props.chessMoves ?
             Object.values(this.props.chessMoves[game.id]) : []
 
+            // there may be duplicate moves (with same move.number)
+            // (for any move.number only the one with the lowest move.id is )
+            let moveCount = moves.length > 0 ? moves[moves.length - 1].number : 0
+
             let imWhite = game.challengerEmail === this.props.myEmail
             let myTurn = imWhite && moves % 2 === 0
 
@@ -110,7 +114,7 @@ class Lobby extends React.Component {
                 key={index}
                 onClick={() => { this.props.selectGame(game, moves) }}>
                 <strong>{game.id + ': '}</strong>
-                {moves.length + ' move' + (moves.length !== 1 ? 's' : '')}
+                {moveCount + ' move' + (moves.length !== 1 ? 's' : '')}
                 {myTurn ? ' (My turn)' : null}
               </MenuItem>
             )
