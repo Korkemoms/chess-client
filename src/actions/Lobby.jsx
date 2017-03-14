@@ -145,7 +145,7 @@ export const fetchUpdates = (myFetch, updateIndex) => (dispatch, getState) => {
       dispatch(moveMany(movesForSelectedGame, true))
     }
   })
-    .catch(error => { // handle errors
-      dispatch(requestUpdatesFailed('Something went wrong: ' + error))
-    })
+  .catch(error => { // handle errors
+    dispatch(requestUpdatesFailed('Something went wrong: ' + error))
+  })
 }
