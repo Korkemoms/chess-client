@@ -250,22 +250,22 @@ $background-color2: #A5BAA0;
 
 .Border-left {
   border-left: 2px solid gray;
-    border-style:groove;
+  border-style:groove;
 }
 
 .Border-right {
   border-right: 2px solid gray;
-    border-style:groove;
+  border-style:groove;
 }
 
 .Border-bot {
   border-bottom: 2px solid gray;
-    border-style:groove;
+  border-style:groove;
 }
 
 .Border-top {
   border-top: 2px solid gray;
-    border-style:groove;
+  border-style:groove;
 }
 
 .Button {
@@ -308,8 +308,10 @@ $background-color2: #A5BAA0;
   cursor: pointer;
 }
 
-.inactive:after{
+.inactive:before{
   position: absolute;
+  top: 0;
+  left: 0;
   content: '';
   background: rgba(255,255,255, 0.9);
   width: 100%;
