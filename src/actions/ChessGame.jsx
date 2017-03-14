@@ -252,7 +252,7 @@ export const move = (fromRow, fromCol, toRow, toCol, number,
 export const sendMove = (move, callback) => (dispatch, getState) => {
   dispatch(_sendMove(move))
 
-  var form = new FormData()
+  let form = new FormData()
   form.append('from_row', move.fromRow)
   form.append('from_col', move.fromCol)
   form.append('to_row', move.toRow)
