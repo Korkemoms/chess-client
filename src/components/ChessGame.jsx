@@ -69,9 +69,6 @@ cssIcon[bBishop] = '-b_bishop'
 cssIcon[bKnight] = '-b_knight'
 cssIcon[bPawn] = '-b_pawn'
 
-/**
- * Chess implementation.
- */
 class ChessGame extends React.Component {
 
   /**
@@ -197,8 +194,7 @@ class ChessGame extends React.Component {
               disabled={!canConfirmMove}
               style={{margin: '0.4em 0.2em'}}
               bsStyle='primary'
-              onClick={() => this.props.actuallyMove(false, this.props.chessStateHistory,
-                this.props.actualIndex)}>Confirm move
+              onClick={() => this.props.actuallyMove(false)}>Confirm move
               </Button>
               : ''
           }
@@ -214,8 +210,7 @@ class ChessGame extends React.Component {
             this.props.displayConfirmation
             ? <Button style={{margin: '0.4em 0.2em'}}
               bsStyle='warning'
-              onClick={() => this.props.actuallyMove(true, this.props.chessStateHistory,
-                this.props.actualIndex)}>I'm sure
+              onClick={() => this.props.actuallyMove(true)}>I'm sure
               </Button>
               : ''
           }
