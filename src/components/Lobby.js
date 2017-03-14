@@ -232,7 +232,7 @@ class Lobby extends React.Component {
       this.props.myFetch !== null
 
     if (!loggedIn) {
-      return <div style={{ position: 'relative', zIndex: '10', textAlign: 'center'}}>
+      return <div style={{ position: 'relative', marginBottom: '1em', zIndex: '10', textAlign: 'center'}}>
         <h3>You must log in to play</h3>
         <Button bsStyle='success' onClick={() => this.props.navigate('/login')}>Log in</Button>
       </div>
