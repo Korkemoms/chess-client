@@ -62,16 +62,19 @@ export const actuallyMove = confirmed => (dispatch, getState) => {
 
     let visualIndex = state.actualIndex + 1
 
-    dispatch(setDisplayConfirmation(false))
-    dispatch(setActualIndex(visualIndex))
-    dispatch(setVisualIndex(visualIndex))
-
     let move = {
       chessGameId: state.gameId,
       ...lastMove
     }
 
-    dispatch(sendMove(move))
+    dispatch(setDisplayConfirmation(false))
+    dispatch(setActualIndex(visualIndex))
+    dispatch(setVisualIndex(visualIndex))
+    dispatch(sendMove(move, result => {
+      if (result.status !== 'ok') {
+        console.war('Server did not accept move', move)
+      }
+    }))
   } else {
     dispatch(setDisplayConfirmation(true))
   }
@@ -178,7 +181,7 @@ export const moveMany = (moves, actual) => (dispatch, getState) => {
 
   let index = actual ? state.actualIndex : state.visualIndex
   let chessState = state.chessStateHistory[index]
-  const newHistory = state.chessStateHistory.slice()
+  const newHistory = state.chessStateHistory.slice(0, index + 1)
 
   let lastMoveNumber = chessState.moves.length > 0
   ? chessState.moves[chessState.moves.length - 1].number : 0
@@ -193,7 +196,7 @@ export const moveMany = (moves, actual) => (dispatch, getState) => {
       index++
       lastMoveNumber++
     } else {
-      console.log('Duplicate move (' + number + '), ignoring')
+      throw Error(`Wrong move number. Actual:${number} Expected:${lastMoveNumber + 1}`)
     }
   })
 
@@ -246,7 +249,7 @@ export const move = (fromRow, fromCol, toRow, toCol, number,
     return newRuleState
   }
 
-export const sendMove = (move) => (dispatch, getState) => {
+export const sendMove = (move, callback) => (dispatch, getState) => {
   dispatch(_sendMove(move))
 
   var form = new FormData()
@@ -261,8 +264,8 @@ export const sendMove = (move) => (dispatch, getState) => {
   return getState().chessGame.myFetch('/chess-moves', {
     method: 'POST',
     body: form
+  }, callback)
+  .catch(error => { // handle errors
+    dispatch(sendMovesFailed('Something went wrong: ' + error))
   })
-    .catch(error => { // handle errors
-      dispatch(sendMovesFailed('Something went wrong: ' + error))
-    })
 }
