@@ -3,7 +3,6 @@ import {
   clearChessGame,
   initWithMoves
 } from './ChessGame'
-import ChessRules from '../components/ChessRules'
 
 export const receivePlayers = players => {
   return {
