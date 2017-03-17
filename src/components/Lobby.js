@@ -48,6 +48,7 @@ class Lobby extends React.Component {
   }
 
   playerTab () {
+    // button to challenge seelcted player
     let challengeButton =
       <Button disabled={this.props.selectedPlayerId === null}
         bsStyle='primary'
@@ -58,6 +59,7 @@ class Lobby extends React.Component {
             Challenge
       </Button>
 
+    // prepare entries for dropdown button displaying my games vs selected player
     let myGamesVsSelectedOpponent = []
     if (this.props.selectedPlayer) {
       this.props.chessGames.forEach(game => {
@@ -67,36 +69,18 @@ class Lobby extends React.Component {
               game.opponentEmail === p.myEmail
         let selectedOpponentsGame = game.challengerEmail === p.selectedPlayer.email ||
               game.opponentEmail === p.selectedPlayer.email
-
         let selectedMyself = p.selectedPlayer.email === p.myEmail
-        let meVsMyself = game.challengerEmail === game.opponentEmail
+        let vsItself = game.challengerEmail === game.opponentEmail
 
-        let addGame = selectedMyself && meVsMyself
+        let addGame = selectedMyself && vsItself && myGame
         addGame |= !selectedMyself && myGame && selectedOpponentsGame
-
         if (addGame) {
           myGamesVsSelectedOpponent.push(game)
         }
       })
     }
 
-    let myGamesVsPreviousSelectedOpponent = []
-    if (this.props.previousSelectedPlayer) {
-      this.props.chessGames.forEach(game => {
-        let p = this.props
-
-        let myGame = game.challengerEmail === p.myEmail ||
-                      game.opponentEmail === p.myEmail
-
-        let previouslySelectedOpponentsGame = game.challengerEmail === p.previousSelectedPlayer.email ||
-                      game.opponentEmail === p.previousSelectedPlayer.email
-
-        if (myGame && previouslySelectedOpponentsGame) {
-          myGamesVsPreviousSelectedOpponent.push(game)
-        }
-      })
-    }
-
+    // setup dropdown button for selecting any of my games vs selected player
     let myGamesVsSelectedOpponentButton = myGamesVsSelectedOpponent.length > 0
         ? <DropdownButton
           id={`games-vs-selected-player-dropdown`}
@@ -108,6 +92,7 @@ class Lobby extends React.Component {
 
             // there may be duplicate moves (with same move.number)
             // (for any move.number only the one with the lowest move.id is )
+            // TODO I will remove duplicate moves soon
             let moveCount = moves.length > 0 ? moves[moves.length - 1].number : 0
 
             let imWhite = game.challengerEmail === this.props.myEmail
@@ -127,14 +112,30 @@ class Lobby extends React.Component {
         </DropdownButton>
         : null
 
-    // this button is only added so it doesnt look
-    // like a button just disappears when transitioning
-    // to another pane
+    // dropdown button that does nothing, its just there to
+    // look pretty during transitioning to another tab
+    let myGamesVsPreviousSelectedOpponent = []
+    if (this.props.previousSelectedPlayer) {
+      this.props.chessGames.forEach(game => {
+        let p = this.props
+
+        let myGame = game.challengerEmail === p.myEmail ||
+                              game.opponentEmail === p.myEmail
+
+        let previouslySelectedOpponentsGame = game.challengerEmail === p.previousSelectedPlayer.email ||
+                              game.opponentEmail === p.previousSelectedPlayer.email
+
+        if (myGame && previouslySelectedOpponentsGame) {
+          myGamesVsPreviousSelectedOpponent.push(game)
+        }
+      })
+    }
     let myGamesVsPreviouslySelectedOpponentButton = myGamesVsPreviousSelectedOpponent.length > 0
         ? <DropdownButton id={`games-vs-previously-selected-player-dropdown`}
           bsStyle='success' title='Games' />
         : null
 
+    // prepare all player tabs
     return (
       <Tab.Pane eventKey='players'>
         <PanelGroup activeKey={this.props.selectedPlayerId} accordion >
@@ -171,6 +172,7 @@ class Lobby extends React.Component {
 
   gamesTab () {
     let panels = this.props.chessGames.map((chessGame, index) => {
+      // prepare button
       let showGameButton =
         <Button
           active={chessGame.id === this.props.selectedGameId}
@@ -185,19 +187,18 @@ class Lobby extends React.Component {
                     ? 'Show game' : 'Spectate'}
         </Button>
 
+      // prepare text
       let boldChallengerName = chessGame.challengerEmail === this.props.myEmail
       let boldOpponentName = chessGame.opponentEmail === this.props.myEmail
-
       let challengerName = boldChallengerName
             ? <strong>{chessGame.challengerName}</strong>
             : chessGame.challengerName
-
       let opponentName = boldOpponentName
             ? <strong>{chessGame.opponentName}</strong>
             : chessGame.opponentName
-
       let headerText = <div>{challengerName}{' vs '}{opponentName}</div>
 
+      // one panel for each game
       return (<Panel
         header={headerText}
         key={index}
