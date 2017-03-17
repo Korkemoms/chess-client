@@ -6,8 +6,8 @@ import './App.scss'
 
 import { createStore, applyMiddleware, combineReducers } from 'redux'
 import { Provider } from 'react-redux'
-import chessGameReducer, { chessGameInitialState } from './reducers/ChessGame'
-import lobbyReducer, { lobbyInitialState } from './reducers/Lobby'
+import chessGameReducer from './reducers/ChessGame'
+import lobbyReducer from './reducers/Lobby'
 
 import thunkMiddleware from 'redux-thunk'
 import createLogger from 'redux-logger'
