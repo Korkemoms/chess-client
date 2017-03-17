@@ -160,7 +160,7 @@ export const initWithMoves = (moves, actual) => dispatch => {
   let index = 0
 
   let chessState = new ChessRules()
-  chessState.init()
+  // chessState.init()
   const newHistory = []
   newHistory.push(chessState)
 

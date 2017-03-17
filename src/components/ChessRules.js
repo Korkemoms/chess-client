@@ -60,9 +60,7 @@ export default class ChessRules {
     this.whoseTurn = 'White'
     this.deadPieces = []
     this.moves = []
-  }
 
-  init () {
     for (let row = 0; row < 8; row++) {
       for (let col = 0; col < 8; col++) {
         this.pieces.push(emptyPiece.copy())
@@ -105,6 +103,50 @@ export default class ChessRules {
       this.pieces[col++ + (row * 8)] = new Piece(wPawn, 'White', 0)
     }
   }
+
+  /* init () {
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 8; col++) {
+        this.pieces.push(emptyPiece.copy())
+      }
+    }
+
+    // Black pieces
+    let row = 0
+    let col = 0
+    this.pieces[col++ + (row * 8)] = new Piece(bRook, 'Black', 0)
+    this.pieces[col++ + (row * 8)] = new Piece(bKnight, 'Black', 0)
+    this.pieces[col++ + (row * 8)] = new Piece(bBishop, 'Black', 0)
+    this.pieces[col++ + (row * 8)] = new Piece(bQueen, 'Black', 0)
+    this.pieces[col++ + (row * 8)] = new Piece(bBishop, 'Black', 0)
+    this.pieces[col++ + (row * 8)] = new Piece(bKing, 'Black', 0)
+    this.pieces[col++ + (row * 8)] = new Piece(bKnight, 'Black', 0)
+    this.pieces[col++ + (row * 8)] = new Piece(bRook, 'Black', 0)
+
+    row = 1
+    col = 0
+    for (let i = 0; i < 8; i++) {
+      this.pieces[col++ + (row * 8)] = new Piece(bPawn, 'Black', 0)
+    }
+
+    // White pieces
+    row = 7
+    col = 0
+    this.pieces[col++ + (row * 8)] = new Piece(wRook, 'White', 0)
+    this.pieces[col++ + (row * 8)] = new Piece(wKnight, 'White', 0)
+    this.pieces[col++ + (row * 8)] = new Piece(wBishop, 'White', 0)
+    this.pieces[col++ + (row * 8)] = new Piece(wQueen, 'White', 0)
+    this.pieces[col++ + (row * 8)] = new Piece(wKing, 'White', 0)
+    this.pieces[col++ + (row * 8)] = new Piece(wBishop, 'White', 0)
+    this.pieces[col++ + (row * 8)] = new Piece(wKnight, 'White', 0)
+    this.pieces[col++ + (row * 8)] = new Piece(wRook, 'White', 0)
+
+    row = 6
+    col = 0
+    for (let i = 0; i < 8; i++) {
+      this.pieces[col++ + (row * 8)] = new Piece(wPawn, 'White', 0)
+    }
+  } */
 
   copy () {
     const gameState = new ChessRules()

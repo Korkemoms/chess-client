@@ -1,9 +1,8 @@
 import ChessRules from '../components/ChessRules'
 
 const chessState = new ChessRules()
-chessState.init()
-const chessStateHistory = []
-chessStateHistory.push(chessState)
+// chessState.init()
+const chessStateHistory = [chessState]
 
 export const chessGameInitialState = {
   focusRow: -1,
@@ -45,11 +44,12 @@ const update = (state = chessGameInitialState, action) => {
         chessStateHistory: action.chessStateHistory
       })
     case 'CLEAR_CHESS_GAME' : {
+      // fresh history
       const chessState = new ChessRules()
-      chessState.init()
-      const chessStateHistory = []
-      chessStateHistory.push(chessState)
+      // chessState.init()
+      const chessStateHistory = [chessState]
 
+      // blank game
       return Object.assign({}, state, {
         focusRow: -1,
         focusCol: -1,
@@ -68,6 +68,7 @@ const update = (state = chessGameInitialState, action) => {
     case 'RECEIVE_CHESS_GAMES': {
       let current = state // its not copied!
 
+      // determine if we receive info about current game (same id)
       let received
       Object.values(action.chessGames).forEach(game => {
         if (game.id === current.gameId) {
@@ -79,20 +80,21 @@ const update = (state = chessGameInitialState, action) => {
         return Object.assign({}, state)
       }
 
-      let imChallenger = received.challengerEmail === state.myEmail
+      // we received info about current game
 
+      // determine some values
+      let imChallenger = received.challengerEmail === state.myEmail
       let playerName = !imChallenger ? received.opponentName
       : received.challengerName
       let playerEmail = !imChallenger ? received.opponentEmail
       : received.challengerEmail
-
       let opponentName = imChallenger ? received.opponentName
       : received.challengerName
       let opponentEmail = imChallenger ? received.opponentEmail
       : received.challengerEmail
-
       let spectator = opponentEmail !== state.myEmail && playerEmail !== state.myEmail
 
+      // copy info received into current game
       return Object.assign({}, state, {
         playerName: playerName,
         playerEmail: playerEmail,
@@ -105,25 +107,25 @@ const update = (state = chessGameInitialState, action) => {
     }
 
     case 'SELECT_GAME': {
+      // determine some values
       let imChallenger = action.selectedGame.challengerEmail === state.myEmail
-
       let playerName = !imChallenger ? action.selectedGame.opponentName
         : action.selectedGame.challengerName
       let playerEmail = !imChallenger ? action.selectedGame.opponentEmail
           : action.selectedGame.challengerEmail
-
       let opponentName = imChallenger ? action.selectedGame.opponentName
         : action.selectedGame.challengerName
       let opponentEmail = imChallenger ? action.selectedGame.opponentEmail
           : action.selectedGame.challengerEmail
+      let spectator = opponentEmail !== state.myEmail &&
+        playerEmail !== state.myEmail
 
-      let spectator = opponentEmail !== state.myEmail && playerEmail !== state.myEmail
-
+      // fresh history
       const chessState = new ChessRules()
-      chessState.init()
-      const chessStateHistory = []
-      chessStateHistory.push(chessState)
+      // chessState.init()
+      const chessStateHistory = [chessState]
 
+      // new game
       return Object.assign({}, state, {
         focusRow: -1,
         focusCol: -1,
