@@ -54,10 +54,10 @@ export const expandGame = (game) => {
   }
 }
 
-export const _challengePlayer = playerEmail => {
+export const _challengePlayer = player => {
   return {
     type: 'CHALLENGE_PLAYER',
-    challengedPlayerEmail: playerEmail
+    challengedPlayer: player
   }
 }
 
@@ -122,7 +122,7 @@ export const selectGame = (game, moves) => dispatch => {
  */
 export const challengePlayer = (myFetch, me, player) => dispatch => {
   console.log(me, player)
-  dispatch(_challengePlayer(player.email))
+  dispatch(_challengePlayer(player))
 
   var form = new FormData()
   form.append('challenger_email', me.email)
