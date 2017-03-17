@@ -54,6 +54,17 @@ export const clearChessGame = () => {
   }
 }
 
+/**
+ * Actually move a piece if confirmed.
+ * This means moving the piece like normal but also updating the
+ * 'actual index' and sending the move to the server.
+ * If not confirmed this method makes confirmation buttons appear.
+ *
+ * Nothing is done directly by this method
+ * instead appropriate 'real' actions are dispatched.
+ *
+ * @param {boolean} confirmed Whether the move is confirmed
+ */
 export const actuallyMove = confirmed => (dispatch, getState) => {
   let state = getState().chessGame
   if (confirmed) {
@@ -80,6 +91,15 @@ export const actuallyMove = confirmed => (dispatch, getState) => {
   }
 }
 
+/**
+ * Determines what to do when a square on the board is clicked,
+ * then appropriate actions are dispatched.
+ *
+ * Nothing is done directly by this method
+ * instead appropriate 'real' actions are dispatched.
+ * @param {number} row 1-8, the labels on the board are in opposite order (8-1)
+ * @param {number} col 1-8, the labels on the board are in opposite order (h-a)
+ */
 export const handleClick = (row, col) => (dispatch, getState) => {
   // gather some info
 
@@ -107,7 +127,7 @@ export const handleClick = (row, col) => (dispatch, getState) => {
   let shouldMove = focusColor === chessState.whoseTurn && gotFocus &&
     chessState.canMove(focusRow, focusCol, row, col) && haveOpponent && future
 
-  // do it
+  // update redux store
   if (shouldSetFocus) { // lift up the piece
     const newHistory = state.chessStateHistory.slice()
 
@@ -128,8 +148,10 @@ export const handleClick = (row, col) => (dispatch, getState) => {
 }
 
 /**
- * Perform many moves
- * @param moves
+ * Init the game with 0 or more moves. Nothing is done directly by this method
+ * instead appropriate 'real' actions are dispatched.
+ * @param {Array} moves The moves to be performed
+ * @param {boolean} actual Whether to also update the 'actual index'
  * @returns the chess state after the moves
  */
 export const initWithMoves = (moves, actual) => dispatch => {
@@ -142,11 +164,11 @@ export const initWithMoves = (moves, actual) => dispatch => {
   const newHistory = []
   newHistory.push(chessState)
 
+  // add new chess rule states to history
   let lastMoveNumber = chessState.moves.length > 0
   ? chessState.moves[chessState.moves.length - 1].number : 0
 
   moves = moves.sort((a, b) => a.number - b.number)
-
   moves.forEach(function (move) {
     let number = Number(move.number)
     if (number === lastMoveNumber + 1) {
@@ -159,6 +181,7 @@ export const initWithMoves = (moves, actual) => dispatch => {
     }
   })
 
+  // update redux store
   dispatch(setChessStateHistory(newHistory))
   dispatch(setVisualIndex(index))
   if (actual) {
@@ -170,8 +193,10 @@ export const initWithMoves = (moves, actual) => dispatch => {
 }
 
 /**
- * Perform many moves
- * @param moves
+ * Apply 0 or more moves. Nothing is done directly by this method
+ * instead appropriate 'real' actions are dispatched.
+ * @param {Array} moves The moves to be performed
+ * @param {boolean} actual Whether to also update the 'actual index'
  * @returns the chess state after the moves
  */
 export const moveMany = (moves, actual) => (dispatch, getState) => {
@@ -183,11 +208,11 @@ export const moveMany = (moves, actual) => (dispatch, getState) => {
   let chessState = state.chessStateHistory[index]
   const newHistory = state.chessStateHistory.slice(0, index + 1)
 
+  // add new chess rule states to history
   let lastMoveNumber = chessState.moves.length > 0
   ? chessState.moves[chessState.moves.length - 1].number : 0
 
   moves = moves.sort((a, b) => a.number - b.number)
-
   moves.forEach(function (move) {
     let number = Number(move.number)
     if (number === lastMoveNumber + 1) {
@@ -200,6 +225,7 @@ export const moveMany = (moves, actual) => (dispatch, getState) => {
     }
   })
 
+  // update components
   dispatch(setChessStateHistory(newHistory))
   dispatch(setVisualIndex(index))
   if (actual) {
@@ -211,33 +237,34 @@ export const moveMany = (moves, actual) => (dispatch, getState) => {
 }
 
 /**
- * Move one piece
- * @param number move number, to avoid performing the same move twice.
- * @param actual whether to actually move the piece
- * @returns state the chess state after the moves
+ * Apply 1 move. Nothing is done directly by this method
+ * instead appropriate 'real' actions are dispatched.
+ * @param {boolean} actual Whether to also update the 'actual index'
+ * @param {number} number The move number, it is used to prevent 'duplicate' moves.
+ * @returns the chess state after the moves
  */
 export const move = (fromRow, fromCol, toRow, toCol, number,
   actual) => (dispatch, getState) => {
     let state = getState().chessGame
 
-    number = Number(number)
-
     const index = actual ? state.actualIndex : state.visualIndex
     const chessState = state.chessStateHistory[index]
 
+    // verify move number
+    number = Number(number)
     let lastMoveNumber = chessState.moves.length > 0
     ? chessState.moves[chessState.moves.length - 1].number : 0
-
     if (number !== lastMoveNumber + 1) {
       console.log('Duplicate move (' + number + '), ignoring')
       return null
     }
 
+    // add a new chess rule state to history
     const newRuleState = chessState.move(fromRow, fromCol, toRow, toCol)
-
     const newHistory = state.chessStateHistory.slice(0, index + 1)
     newHistory.push(newRuleState)
 
+    // update redux store
     dispatch(setChessStateHistory(newHistory))
     dispatch(setVisualIndex(index + 1))
     if (actual) {
@@ -249,6 +276,26 @@ export const move = (fromRow, fromCol, toRow, toCol, number,
     return newRuleState
   }
 
+/**
+ * @typedef {Object} Move
+ * @property {number} fromRow
+ * @property {number} fromCol
+ * @property {number} toRow
+ * @property {number} toCol
+ * @property {number} number The move number
+ * @property {number} chessGameId
+ */
+
+/**
+* @callback callback
+* @param {object} response The response body from the API
+*/
+
+/**
+ * Send a move to the server.
+ *  @param {Move} move the move to send
+ *  @param {callback} callback the response from the API
+ */
 export const sendMove = (move, callback) => (dispatch, getState) => {
   dispatch(_sendMove(move))
 
@@ -257,7 +304,6 @@ export const sendMove = (move, callback) => (dispatch, getState) => {
   form.append('from_col', move.fromCol)
   form.append('to_row', move.toRow)
   form.append('to_col', move.toCol)
-  form.append('number', move.number)
   form.append('number', move.number)
   form.append('chess_game_id', move.chessGameId)
 

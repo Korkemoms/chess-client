@@ -95,6 +95,31 @@ export const selectGame = (game, moves) => dispatch => {
   dispatch(initWithMoves(moves, true))
 }
 
+/**
+ * @callback myFetchCallback
+ * @param {Object} body The response body
+ * @param {Object} header The response header
+ */
+
+ /**
+  * @function myFetch
+  * @param {string} what The url describing what to fetch
+  * @param {Object} props Additional fetch properties
+  * @param {myFetchCallback} what Called after successfully fetching resource
+  */
+
+/**
+ * @typedef {Object} player
+ * @property {string} name
+ * @property {string} email
+ */
+
+/**
+ * Send a challenge to the server.
+ * @param {myFetch} myFetch custom fetch
+ * @param {player} player Player to challenge
+ * @param {player} me The challenger
+ */
 export const challengePlayer = (myFetch, me, player) => dispatch => {
   console.log(me, player)
   dispatch(_challengePlayer(player.email))
@@ -114,6 +139,12 @@ export const challengePlayer = (myFetch, me, player) => dispatch => {
   })
 }
 
+/**
+ * Request updates from server, will only send you resources
+ * whose updateIndex is larger than the given one.
+ * @param {myFetch} myFetch custom fetch
+ * @param {number} updateIndex Tells the server what you already know
+ */
 export const fetchUpdates = (myFetch, updateIndex) => (dispatch, getState) => {
     // dispatch(requestUpdates(updateIndex))
   let state = getState().lobby
@@ -125,6 +156,7 @@ export const fetchUpdates = (myFetch, updateIndex) => (dispatch, getState) => {
     method: 'GET',
     headers
   }, (json, headers) => {
+    // dispatch events to update redux store
     if (json.players.data.length > 0) {
       dispatch(receivePlayers(json.players.data))
     }
