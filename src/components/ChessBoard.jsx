@@ -303,6 +303,17 @@ export default class ChessBoard extends React.Component {
           klass += ' Border-right'
         }
 
+        // round corners
+        if (i === 0 && j === 0) {
+          klass += ' Top-left'
+        } else if (i === 0 && j === 7) {
+          klass += ' Top-right'
+        } else if (i === 7 && j === 0) {
+          klass += ' Bot-left'
+        } else if (i === 7 && j === 7) {
+          klass += ' Bot-right'
+        }
+
         squares.push(
           <Square
             key={key++}

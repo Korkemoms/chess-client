@@ -249,24 +249,42 @@ $background-color2: #A5BAA0;
 }
 
 .Border-left {
-  border-left: 2px solid gray;
-  border-style:groove;
+  border-left: 2px solid #2d2d2d;
+  //border-style:groove;
 }
 
 .Border-right {
-  border-right: 2px solid gray;
-  border-style:groove;
+  border-right: 2px solid #2d2d2d;
+  //border-style:groove;
 }
 
 .Border-bot {
-  border-bottom: 2px solid gray;
-  border-style:groove;
+  border-bottom: 2px solid #2d2d2d;
+  //border-style:groove;
 }
 
 .Border-top {
-  border-top: 2px solid gray;
-  border-style:groove;
+  border-top: 2px solid #2d2d2d;
+  //border-style:groove;
 }
+
+.Top-left {
+  border-radius: 5px 0 0 0;
+}
+
+.Top-right {
+  border-radius: 0 5px 0 0;
+}
+
+.Bot-left {
+  border-radius: 0 0 0 5px;
+}
+
+.Bot-right {
+  border-radius: 0 0 5px 0;
+}
+
+
 
 .Button {
 
