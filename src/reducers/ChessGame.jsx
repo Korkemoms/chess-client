@@ -9,7 +9,7 @@ export const chessGameInitialState = {
   focusCol: -1,
   visualIndex: 0,
   actualIndex: 0,
-  myEmail: null,
+  myUid: null,
   myName: null,
   gameId: null,
   displayConfirmation: false,
@@ -83,23 +83,23 @@ const update = (state = chessGameInitialState, action) => {
       // we received info about current game
 
       // determine some values
-      let imChallenger = received.challengerEmail === state.myEmail
+      let imChallenger = received.challengerUid === state.myUid
       let playerName = !imChallenger ? received.opponentName
       : received.challengerName
-      let playerEmail = !imChallenger ? received.opponentEmail
-      : received.challengerEmail
+      let playerUid = !imChallenger ? received.opponentUid
+      : received.challengerUid
       let opponentName = imChallenger ? received.opponentName
       : received.challengerName
-      let opponentEmail = imChallenger ? received.opponentEmail
-      : received.challengerEmail
-      let spectator = opponentEmail !== state.myEmail && playerEmail !== state.myEmail
+      let opponentUid = imChallenger ? received.opponentUid
+      : received.challengerUid
+      let spectator = opponentUid !== state.myUid && playerUid !== state.myUid
 
       // copy info received into current game
       return Object.assign({}, state, {
         playerName: playerName,
-        playerEmail: playerEmail,
+        playerUid: playerUid,
         opponentName: opponentName,
-        opponentEmail: opponentEmail,
+        opponentUid: opponentUid,
         displayConfirmation: false,
         myColor: imChallenger ? 'White' : 'Black',
         spectator: spectator
@@ -108,17 +108,17 @@ const update = (state = chessGameInitialState, action) => {
 
     case 'SELECT_GAME': {
       // determine some values
-      let imChallenger = action.selectedGame.challengerEmail === state.myEmail
+      let imChallenger = action.selectedGame.challengerUid === state.myUid
       let playerName = !imChallenger ? action.selectedGame.opponentName
         : action.selectedGame.challengerName
-      let playerEmail = !imChallenger ? action.selectedGame.opponentEmail
-          : action.selectedGame.challengerEmail
+      let playerUid = !imChallenger ? action.selectedGame.opponentUid
+          : action.selectedGame.challengerUid
       let opponentName = imChallenger ? action.selectedGame.opponentName
         : action.selectedGame.challengerName
-      let opponentEmail = imChallenger ? action.selectedGame.opponentEmail
-          : action.selectedGame.challengerEmail
-      let spectator = opponentEmail !== state.myEmail &&
-        playerEmail !== state.myEmail
+      let opponentUid = imChallenger ? action.selectedGame.opponentUid
+          : action.selectedGame.challengerUid
+      let spectator = opponentUid !== state.myUid &&
+        playerUid !== state.myUid
 
       // fresh history
       const chessState = new ChessRules()
@@ -132,9 +132,9 @@ const update = (state = chessGameInitialState, action) => {
         visualIndex: 0,
         actualIndex: 0,
         playerName: playerName,
-        playerEmail: playerEmail,
+        playerUid: playerUid,
         opponentName: opponentName,
-        opponentEmail: opponentEmail,
+        opponentUid: opponentUid,
         chessStateHistory: chessStateHistory,
         gameId: action.selectedGame.id,
         displayConfirmation: false,

@@ -49,7 +49,6 @@ export const _selectGame = (game, moves) => {
 export const expandGame = (game) => {
   return {
     type: 'EXPAND_GAME',
-    expandedGameId: game.id,
     expandedGame: game
   }
 }
@@ -61,10 +60,10 @@ export const _challengePlayer = player => {
   }
 }
 
-export const challengePlayerFailed = playerEmail => {
+export const challengePlayerFailed = player => {
   return {
     type: 'CHALLENGE_PLAYER_FAILED',
-    challengedPlayerEmail: playerEmail
+    challengedPlayer: player
   }
 }
 
@@ -101,17 +100,16 @@ export const selectGame = (game, moves) => dispatch => {
  * @param {Object} header The response header
  */
 
- /**
-  * @function myFetch
-  * @param {string} what The url describing what to fetch
-  * @param {Object} props Additional fetch properties
-  * @param {myFetchCallback} what Called after successfully fetching resource
-  */
+/**
+ * @function myFetch
+ * @param {string} what The url describing what to fetch
+ * @param {Object} props Additional fetch properties
+ * @param {myFetchCallback} what Called after successfully fetching resource
+*/
 
 /**
  * @typedef {Object} player
  * @property {string} name
- * @property {string} email
  */
 
 /**
@@ -125,8 +123,8 @@ export const challengePlayer = (myFetch, me, player) => dispatch => {
   dispatch(_challengePlayer(player))
 
   var form = new FormData()
-  form.append('challenger_email', me.email)
-  form.append('opponent_email', player.email)
+  form.append('challenger_uid', me.uid)
+  form.append('opponent_uid', player.uid)
   form.append('challenger_name', me.name)
   form.append('opponent_name', player.name)
 

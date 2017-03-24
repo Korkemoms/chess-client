@@ -33,7 +33,7 @@ class Lobby extends React.Component {
 
       let props = _this.props
       let loggedIn = props.myName !== null &&
-        props.myEmail !== null && props.myFetch !== null
+        props.myUid !== null && props.myFetch !== null
       if (!loggedIn) {
         return
       }
@@ -50,11 +50,11 @@ class Lobby extends React.Component {
   playerTab () {
     // button to challenge seelcted player
     let challengeButton =
-      <Button disabled={this.props.selectedPlayerId === null}
+      <Button disabled={this.props.selectedPlayerUid === null}
         bsStyle='primary'
         onClick={() => this.props.challengePlayer(
           this.props.myFetch,
-          {email: this.props.myEmail, name: this.props.myName},
+          {uid: this.props.myUid, name: this.props.myName},
           this.props.selectedPlayer)}>
             Challenge
       </Button>
@@ -64,13 +64,17 @@ class Lobby extends React.Component {
     if (this.props.selectedPlayer) {
       this.props.chessGames.forEach(game => {
         let p = this.props
+        let sel = this.props.selectedPlayer
 
-        let myGame = game.challengerEmail === p.myEmail ||
-              game.opponentEmail === p.myEmail
-        let selectedOpponentsGame = game.challengerEmail === p.selectedPlayer.email ||
-              game.opponentEmail === p.selectedPlayer.email
-        let selectedMyself = p.selectedPlayer.email === p.myEmail
-        let vsItself = game.challengerEmail === game.opponentEmail
+        let myGame = game.challengerUid === p.myUid ||
+              game.opponentUid === p.myUid
+
+        let selectedOpponentsGame =
+              game.challengerUid === sel.uid ||
+              game.opponentUid === sel.uid
+
+        let selectedMyself = sel.uid === p.myUid
+        let vsItself = game.challengerUid === game.opponentUid
 
         let addGame = selectedMyself && vsItself && myGame
         addGame |= !selectedMyself && myGame && selectedOpponentsGame
@@ -80,6 +84,7 @@ class Lobby extends React.Component {
       })
     }
 
+    console.log(myGamesVsSelectedOpponent.length)
     // setup dropdown button for selecting any of my games vs selected player
     let myGamesVsSelectedOpponentButton = myGamesVsSelectedOpponent.length > 0
         ? <DropdownButton
@@ -95,7 +100,7 @@ class Lobby extends React.Component {
             // TODO I will remove duplicate moves soon
             let moveCount = moves.length > 0 ? moves[moves.length - 1].number : 0
 
-            let imWhite = game.challengerEmail === this.props.myEmail
+            let imWhite = game.challengerUid === this.props.myUid
             let myTurn = imWhite && moves % 2 === 0
 
             return (
@@ -117,20 +122,22 @@ class Lobby extends React.Component {
     let myGamesVsPreviousSelectedOpponent = []
     if (this.props.previousSelectedPlayer) {
       this.props.chessGames.forEach(game => {
-        let p = this.props
+        let prev = this.props.previousSelectedPlayer
 
-        let myGame = game.challengerEmail === p.myEmail ||
-                              game.opponentEmail === p.myEmail
+        let myGame = game.challengerUid === this.props.myUid ||
+                     game.opponentUid === this.props.myUid
 
-        let previouslySelectedOpponentsGame = game.challengerEmail === p.previousSelectedPlayer.email ||
-                              game.opponentEmail === p.previousSelectedPlayer.email
+        let previouslySelectedOpponentsGame = prev &&
+          (game.challengerUid === prev.uid ||
+          game.opponentUid === prev.uid)
 
         if (myGame && previouslySelectedOpponentsGame) {
           myGamesVsPreviousSelectedOpponent.push(game)
         }
       })
     }
-    let myGamesVsPreviouslySelectedOpponentButton = myGamesVsPreviousSelectedOpponent.length > 0
+    let myGamesVsPreviouslySelectedOpponentButton =
+      myGamesVsPreviousSelectedOpponent.length > 0
         ? <DropdownButton id={`games-vs-previously-selected-player-dropdown`}
           bsStyle='success' title='Games' />
         : null
@@ -138,24 +145,28 @@ class Lobby extends React.Component {
     // prepare all player tabs
     return (
       <Tab.Pane eventKey='players'>
-        <PanelGroup activeKey={this.props.selectedPlayerId} accordion >
+        <PanelGroup activeKey={this.props.selectedPlayer
+            ? this.props.selectedPlayer.uid : null}
+          accordion >
           {this.props.players.map((player, index) => {
-            let boldPlayerName = player.email === this.props.myEmail
+            let boldPlayerName = player.uid === this.props.myUid
             let headerText = boldPlayerName
                 ? <strong>{player.name}</strong>
                 : player.name
 
             let gamesButton
-            if (player.id === this.props.selectedPlayerId) {
+            if (this.props.selectedPlayer &&
+                this.props.selectedPlayer.uid === player.uid) {
               gamesButton = myGamesVsSelectedOpponentButton
-            } else if (player.id === this.props.previousSelectedPlayerId) {
+            } else if (this.props.previousSelectedPlayer &&
+              this.props.previousSelectedPlayer.uid === player.uid) {
               gamesButton = myGamesVsPreviouslySelectedOpponentButton
             }
             return (
               <Panel
                 header={headerText}
                 key={index}
-                eventKey={player.id}
+                eventKey={player.uid}
                 onClick={() => this.props.selectPlayer(player)}>
                 <ButtonToolbar>
                   {challengeButton}
@@ -175,21 +186,22 @@ class Lobby extends React.Component {
       // prepare button
       let showGameButton =
         <Button
-          active={chessGame.id === this.props.selectedGameId}
+          active={this.props.selectedGame
+            && this.props.selectedGame.id === chessGame.id}
           bsStyle='primary'
           onClick={() => {
             let moves = chessGame.id in this.props.chessMoves
             ? Object.values(this.props.chessMoves[chessGame.id]) : []
             this.props.selectGame(chessGame, moves)
           }} >
-          {this.props.myEmail === chessGame.challengerEmail ||
-                this.props.myEmail === chessGame.opponentEmail
+          {this.props.myUid === chessGame.challengerUid ||
+                this.props.myUid === chessGame.opponentUid
                     ? 'Show game' : 'Spectate'}
         </Button>
 
       // prepare text
-      let boldChallengerName = chessGame.challengerEmail === this.props.myEmail
-      let boldOpponentName = chessGame.opponentEmail === this.props.myEmail
+      let boldChallengerName = chessGame.challengerUid === this.props.myUid
+      let boldOpponentName = chessGame.opponentUid === this.props.myUid
       let challengerName = boldChallengerName
             ? <strong>{chessGame.challengerName}</strong>
             : chessGame.challengerName
@@ -210,7 +222,9 @@ class Lobby extends React.Component {
 
     return (
       <Tab.Pane eventKey='games'>
-        <PanelGroup activeKey={this.props.expandedGameId} accordion>
+        <PanelGroup activeKey={this.props.expandedGame
+            ? this.props.expandedGame.id : null}
+          accordion>
           {panels}
         </PanelGroup>
       </Tab.Pane>)
@@ -234,13 +248,16 @@ class Lobby extends React.Component {
 
   render () {
     let loggedIn = this.props.myName !== null &&
-      this.props.myEmail !== null &&
+      this.props.myUid !== null &&
       this.props.myFetch !== null
 
     if (!loggedIn) {
-      return <div style={{ position: 'relative', marginBottom: '1em', zIndex: '10', textAlign: 'center'}}>
+      return <div style={{
+        position: 'relative', marginBottom: '1em', zIndex: '10', textAlign: 'center'}}>
         <h3>You must log in to play</h3>
-        <Button bsStyle='success' onClick={() => this.props.navigate('/login')}>Log in</Button>
+        <Button bsStyle='success' onClick={
+            () => this.props.navigate('/login')}>Log in
+          </Button>
       </div>
     }
 

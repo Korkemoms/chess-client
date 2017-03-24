@@ -3,12 +3,12 @@ export const lobbyInitialState = {
   chessGames: [],
   chessMoves: {},
   updateIndex: -1,
-  myEmail: null,
+  myUid: null,
   myName: null,
   myFetch: null,
-  selectedPlayerId: null,
-  selectedGameId: null,
-  expandedGameId: null,
+  selectedGame: null,
+  selectedPlayer: null,
+  expandedGame: null,
   selectedTab: 'players'
 }
 
@@ -93,24 +93,18 @@ export default function update (state = lobbyInitialState, action) {
 
     case 'SELECT_PLAYER': {
       let previousSelectedPlayer = state.selectedPlayer
-      let previousSelectedPlayerId = state.selectedPlayerId
       return Object.assign({}, state, {
         previousSelectedPlayer: previousSelectedPlayer,
-        previousSelectedPlayerId: previousSelectedPlayerId,
-        selectedPlayerId: action.selectedPlayer.id,
         selectedPlayer: action.selectedPlayer
-
       })
     }
 
     case 'EXPAND_GAME':
       return Object.assign({}, state, {
-        expandedGameId: action.expandedGame.id,
         expandedGame: action.expandedGame
       })
     case 'SELECT_GAME':
       return Object.assign({}, state, {
-        selectedGameId: action.selectedGame.id,
         selectedGame: action.selectedGame
       })
 

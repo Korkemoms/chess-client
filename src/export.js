@@ -16,8 +16,7 @@ import {
   Grid,
   Row,
   Col,
-  Well,
-  Panel
+  Well
 } from 'react-bootstrap'
 
 const reducer = combineReducers({
@@ -82,6 +81,6 @@ export default class Chess extends React.Component {
 
 Chess.propTypes = {
   myFetch: PropTypes.func,
-  myEmail: PropTypes.string,
+  myUid: PropTypes.string,
   myName: PropTypes.string
 }

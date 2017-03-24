@@ -145,7 +145,7 @@ class ChessGame extends React.Component {
     const actualIndex = this.props.actualIndex
     const actuallyMyTurn = (imWhite && actualIndex % 2 === 0) ||
       (!imWhite && actualIndex % 2 !== 0) ||
-      this.props.playerEmail === this.props.opponentEmail
+      this.props.playerUid === this.props.opponentUid
 
     const canConfirmMove = actuallyMyTurn && visualIndex === actualIndex + 1 &&
      this.props.gameId && this.props.gameId !== null && !this.props.spectator
