@@ -526,13 +526,19 @@ export default class ChessRules {
     // pawn rules (white is bottom)
     function pawnRules (state, unicode) {
       if (unicode === wPawn) {
+        const oneUp = state.pieces[col + ((row - 1) * 8)]
+        const oneUpEmpty = !oneUp || oneUp.unicode === ''
+
         if (targetRow === row - 1 && targetCol === col && !targetHasEnemy) return true
-        if (targetRow === row - 2 && row === 6 && targetCol === col && !targetHasEnemy) return true
+        if (targetRow === row - 2 && row === 6 && targetCol === col && !targetHasEnemy && oneUpEmpty) return true
         if (targetRow === row - 1 && (targetCol === col - 1 || targetCol === col + 1) && targetHasEnemy) return true
       }
       if (unicode === bPawn) {
+        const oneDown = state.pieces[col + ((row + 1) * 8)]
+        const oneDownEmpty = !oneDown || oneDown.unicode === ''
+
         if (targetRow === row + 1 && targetCol === col && !targetHasEnemy) return true
-        if (targetRow === row + 2 && row === 1 && targetCol === col && !targetHasEnemy) return true
+        if (targetRow === row + 2 && row === 1 && targetCol === col && !targetHasEnemy && oneDownEmpty) return true
         if (targetRow === row + 1 && (targetCol === col - 1 || targetCol === col + 1) && targetHasEnemy) return true
       }
       return false
