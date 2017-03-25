@@ -1,25 +1,5 @@
-/**
- * Stateless chess board.
- *
- * Andreas Modahl
- */
-
 import '../Chess.scss'
-import React, { PropTypes } from 'react'
-
-import wKingIcon from '../images/chess_pieces/w_king.png'
-import wQueenIcon from '../images/chess_pieces/w_queen.png'
-import wRookIcon from '../images/chess_pieces/w_rook.png'
-import wBishopIcon from '../images/chess_pieces/w_bishop.png'
-import wKnightIcon from '../images/chess_pieces/w_knight.png'
-import wPawnIcon from '../images/chess_pieces/w_pawn.png'
-
-import bKingIcon from '../images/chess_pieces/b_king.png'
-import bQueenIcon from '../images/chess_pieces/b_queen.png'
-import bRookIcon from '../images/chess_pieces/b_rook.png'
-import bBishopIcon from '../images/chess_pieces/b_bishop.png'
-import bKnightIcon from '../images/chess_pieces/b_knight.png'
-import bPawnIcon from '../images/chess_pieces/b_pawn.png'
+import React from 'react'
 
 const wKing = '\u2654'
 const wQueen = '\u2655'
@@ -34,21 +14,6 @@ const bRook = '\u265C'
 const bBishop = '\u265D'
 const bKnight = '\u265E'
 const bPawn = '\u265F'
-
-const icon = {}
-icon[wKing] = wKingIcon
-icon[wQueen] = wQueenIcon
-icon[wRook] = wRookIcon
-icon[wBishop] = wBishopIcon
-icon[wKnight] = wKnightIcon
-icon[wPawn] = wPawnIcon
-
-icon[bKing] = bKingIcon
-icon[bQueen] = bQueenIcon
-icon[bRook] = bRookIcon
-icon[bBishop] = bBishopIcon
-icon[bKnight] = bKnightIcon
-icon[bPawn] = bPawnIcon
 
 const cssIcon = {}
 cssIcon[wKing] = '-w_king'
@@ -119,6 +84,7 @@ class Label extends React.Component {
 
 /**
  * Graphics for a chess board.
+ * Purely representational component
  */
 export default class ChessBoard extends React.Component {
 
