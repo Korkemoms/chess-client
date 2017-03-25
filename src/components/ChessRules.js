@@ -1,9 +1,3 @@
-/**
- * Chess rules
- *
- * Andreas Modahl
- */
-
 // const rowLabels = '87654321';
 // const colLabels = 'abcdefgh';
 
@@ -49,11 +43,17 @@ class Move {
   }
 
   copy () {
-    return new Move(this.fromRow, this.fromCol, this.toRow, this.toCol, this.number)
+    return new Move(this.fromRow, this.fromCol,
+      this.toRow, this.toCol, this.number)
   }
 }
 
-/* White is bottom */
+// TODO limit history length? (need only length two to implement castling)
+/**
+ *
+ * Chess rules, has a history in order to implement come rules.
+ * White starts bottom (row 6 and 7)
+ */
 export default class ChessRules {
   constructor () {
     this.pieces = []
@@ -104,50 +104,7 @@ export default class ChessRules {
     }
   }
 
-  /* init () {
-    for (let row = 0; row < 8; row++) {
-      for (let col = 0; col < 8; col++) {
-        this.pieces.push(emptyPiece.copy())
-      }
-    }
-
-    // Black pieces
-    let row = 0
-    let col = 0
-    this.pieces[col++ + (row * 8)] = new Piece(bRook, 'Black', 0)
-    this.pieces[col++ + (row * 8)] = new Piece(bKnight, 'Black', 0)
-    this.pieces[col++ + (row * 8)] = new Piece(bBishop, 'Black', 0)
-    this.pieces[col++ + (row * 8)] = new Piece(bQueen, 'Black', 0)
-    this.pieces[col++ + (row * 8)] = new Piece(bBishop, 'Black', 0)
-    this.pieces[col++ + (row * 8)] = new Piece(bKing, 'Black', 0)
-    this.pieces[col++ + (row * 8)] = new Piece(bKnight, 'Black', 0)
-    this.pieces[col++ + (row * 8)] = new Piece(bRook, 'Black', 0)
-
-    row = 1
-    col = 0
-    for (let i = 0; i < 8; i++) {
-      this.pieces[col++ + (row * 8)] = new Piece(bPawn, 'Black', 0)
-    }
-
-    // White pieces
-    row = 7
-    col = 0
-    this.pieces[col++ + (row * 8)] = new Piece(wRook, 'White', 0)
-    this.pieces[col++ + (row * 8)] = new Piece(wKnight, 'White', 0)
-    this.pieces[col++ + (row * 8)] = new Piece(wBishop, 'White', 0)
-    this.pieces[col++ + (row * 8)] = new Piece(wQueen, 'White', 0)
-    this.pieces[col++ + (row * 8)] = new Piece(wKing, 'White', 0)
-    this.pieces[col++ + (row * 8)] = new Piece(wBishop, 'White', 0)
-    this.pieces[col++ + (row * 8)] = new Piece(wKnight, 'White', 0)
-    this.pieces[col++ + (row * 8)] = new Piece(wRook, 'White', 0)
-
-    row = 6
-    col = 0
-    for (let i = 0; i < 8; i++) {
-      this.pieces[col++ + (row * 8)] = new Piece(wPawn, 'White', 0)
-    }
-  } */
-
+  /** Get a complete copy of the state (copies history also) */
   copy () {
     const gameState = new ChessRules()
 
@@ -195,8 +152,10 @@ export default class ChessRules {
     return this.pieces[col + (row * 8)]
   }
 
-  // move a piece, returns a new ChessRules
-  // assumes it is a valid move, see canMove(row,col,targetRow,targetCol)
+/**
+ * Move a piece, returns a new ChessRules
+ * assumes it is a valid move, see canMove(row,col,targetRow,targetCol)
+ */
   move (row, col, targetRow, targetCol) {
     row = Number(row)
     col = Number(col)

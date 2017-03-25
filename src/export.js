@@ -1,4 +1,3 @@
-
 import React, { PropTypes } from 'react'
 import ChessGame from './containers/ChessGame'
 import Lobby from './containers/Lobby'
@@ -34,8 +33,8 @@ const store = createStore(
     )
 )
 
+/** Component that can be used in other react projects */
 export default class Chess extends React.Component {
-
   componentWillMount () {
     const receiveProps = (props) => {
       return {

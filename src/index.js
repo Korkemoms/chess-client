@@ -1,4 +1,4 @@
-
+/** This file is just for testing the game  */
 import React from 'react'
 import { render } from 'react-dom'
 import ChessGame from './containers/ChessGame'

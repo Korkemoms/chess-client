@@ -1,4 +1,3 @@
-
 import React from 'react'
 import {
   Button,
@@ -48,7 +47,7 @@ class Lobby extends React.Component {
   }
 
   playerTab () {
-    // button to challenge seelcted player
+    // button to challenge selected player
     let challengeButton =
       <Button disabled={this.props.selectedPlayerUid === null}
         bsStyle='primary'

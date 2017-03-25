@@ -70,7 +70,7 @@ export default function update (state = lobbyInitialState, action) {
       })
     }
     case 'RECEIVE_CHESS_MOVES': {
-      let local = state.chessMoves // its not copied!
+      let local = state.chessMoves // careful, it not copied
 
       // store the moves in one object per chess game
       let updateIndex = state.updateIndex

@@ -1,9 +1,5 @@
 import ChessRules from '../components/ChessRules'
 
-const chessState = new ChessRules()
-// chessState.init()
-const chessStateHistory = [chessState]
-
 export const chessGameInitialState = {
   focusRow: -1,
   focusCol: -1,
@@ -13,7 +9,7 @@ export const chessGameInitialState = {
   myName: null,
   gameId: null,
   displayConfirmation: false,
-  chessStateHistory: chessStateHistory,
+  chessStateHistory: [new ChessRules()],
   playerName: 'Player1',
   opponentName: 'Player2',
   myColor: 'White',
@@ -44,11 +40,6 @@ const update = (state = chessGameInitialState, action) => {
         chessStateHistory: action.chessStateHistory
       })
     case 'CLEAR_CHESS_GAME' : {
-      // fresh history
-      const chessState = new ChessRules()
-      // chessState.init()
-      const chessStateHistory = [chessState]
-
       // blank game
       return Object.assign({}, state, {
         focusRow: -1,
@@ -57,7 +48,7 @@ const update = (state = chessGameInitialState, action) => {
         actualIndex: 0,
         gameId: null,
         displayConfirmation: false,
-        chessStateHistory: chessStateHistory,
+        chessStateHistory: [new ChessRules()],
         playerName: 'Player1',
         opponentName: 'Player2',
         myColor: 'White',
@@ -66,7 +57,7 @@ const update = (state = chessGameInitialState, action) => {
     }
 
     case 'RECEIVE_CHESS_GAMES': {
-      let current = state // its not copied!
+      let current = state // careful, its not copied
 
       // determine if we receive info about current game (same id)
       let received
@@ -120,11 +111,6 @@ const update = (state = chessGameInitialState, action) => {
       let spectator = opponentUid !== state.myUid &&
         playerUid !== state.myUid
 
-      // fresh history
-      const chessState = new ChessRules()
-      // chessState.init()
-      const chessStateHistory = [chessState]
-
       // new game
       return Object.assign({}, state, {
         focusRow: -1,
@@ -135,7 +121,7 @@ const update = (state = chessGameInitialState, action) => {
         playerUid: playerUid,
         opponentName: opponentName,
         opponentUid: opponentUid,
-        chessStateHistory: chessStateHistory,
+        chessStateHistory: [new ChessRules()],
         gameId: action.selectedGame.id,
         displayConfirmation: false,
         myColor: imChallenger ? 'White' : 'Black',
