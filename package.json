@@ -1,6 +1,6 @@
 {
   "name": "chess-client",
-  "version": "0.3.6-3",
+  "version": "0.3.7",
   "private": true,
   "main": "src/export.js",
   "devDependencies": {
@@ -108,6 +108,14 @@
     "presets": [
       "react-app",
       "es2015"
+    ]
+  },
+  "standard": {
+    "globals": [
+      "localStorage",
+      "Headers",
+      "FormData",
+      "location"
     ]
   },
   "eslintConfig": {
