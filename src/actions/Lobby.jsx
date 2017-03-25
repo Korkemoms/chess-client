@@ -153,7 +153,8 @@ export const fetchUpdates = (myFetch, updateIndex) => (dispatch, getState) => {
   return myFetch('/updates', {
     method: 'GET',
     headers
-  }, (json, headers) => {
+  })
+  .then((headers, json) => {
     // dispatch events to update redux store
     if (json.players.data.length > 0) {
       dispatch(receivePlayers(json.players.data))
