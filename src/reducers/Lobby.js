@@ -1,18 +1,31 @@
-export const lobbyInitialState = {
-  players: [],
-  chessGames: [],
-  chessMoves: {},
-  updateIndex: -1,
-  myUid: null,
-  myName: null,
-  myFetch: null,
-  selectedGame: null,
-  selectedPlayer: null,
-  expandedGame: null,
-  selectedTab: 'players'
-}
+import { PropTypes } from 'react'
+import Lobby from '../components/Lobby'
 
-export default function update (state = lobbyInitialState, action) {
+/** Define initial Redux state and React PropTypes */
+const def = (props = false) => {
+  const f = props ? (_, type) => type : (val, _) => val
+  let r = { // initial Redux state and React PropTypes
+    players: f([], PropTypes.array.isRequired),
+    chessGames: f([], PropTypes.array.isRequired),
+    chessMoves: f({}, PropTypes.object.isRequired),
+    updateIndex: f(-1, PropTypes.number.isRequired),
+    myUid: f(null, PropTypes.string),
+    myName: f(null, PropTypes.string),
+    selectedGame: f(null, PropTypes.object),
+    selectedPlayer: f(null, PropTypes.object),
+    expandedGame: f(null, PropTypes.object),
+    selectedTab: f('players', PropTypes.string.isRequired)
+
+  }
+  if (props) { // add more React PropTypes
+    r = {myFetch: PropTypes.func, ...r}
+  }
+  return r
+}
+const initialState = def()
+Lobby.propTypes = def(true)
+
+export default function update (state = initialState, action) {
   switch (action.type) {
     case 'RECEIVE_PLAYERS': {
       let current = state.players // its not copied!

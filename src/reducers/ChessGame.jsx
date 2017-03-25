@@ -1,22 +1,35 @@
 import ChessRules from '../components/ChessRules'
+import { PropTypes } from 'react'
+import ChessGame from '../components/ChessGame'
 
-export const chessGameInitialState = {
-  focusRow: -1,
-  focusCol: -1,
-  visualIndex: 0,
-  actualIndex: 0,
-  myUid: null,
-  myName: null,
-  gameId: null,
-  displayConfirmation: false,
-  chessStateHistory: [new ChessRules()],
-  playerName: 'Player1',
-  opponentName: 'Player2',
-  myColor: 'White',
-  spectator: true
+/** Define initial Redux state and React PropTypes */
+const def = (props = false) => {
+  const f = props ? (_, type) => type : (val, _) => val
+  let r = { // initial Redux state and React PropTypes
+    focusRow: f(-1, PropTypes.number.isRequired),
+    focusCol: f(-1, PropTypes.number.isRequired),
+    visualIndex: f(0, PropTypes.number.isRequired),
+    actualIndex: f(0, PropTypes.number.isRequired),
+    myUid: f(null, PropTypes.string),
+    myName: f(null, PropTypes.string),
+    gameId: f(null, PropTypes.number),
+    displayConfirmation: f(false, PropTypes.bool),
+    chessStateHistory: f([new ChessRules()], PropTypes.array.isRequired),
+    playerName: f('Player1', PropTypes.string.isRequired),
+    opponentName: f('Player2', PropTypes.string.isRequired),
+    myColor: f('White', PropTypes.string.isRequired),
+    spectator: f(true, PropTypes.bool)
+
+  }
+  if (props) { // add more React PropTypes
+    r = { ...r}
+  }
+  return r
 }
+const initialState = def()
+ChessGame.propTypes = def(true)
 
-const update = (state = chessGameInitialState, action) => {
+const update = (state = initialState, action) => {
   switch (action.type) {
     case 'SET_FOCUS':
       return Object.assign({}, state, {
@@ -41,19 +54,7 @@ const update = (state = chessGameInitialState, action) => {
       })
     case 'CLEAR_CHESS_GAME' : {
       // blank game
-      return Object.assign({}, state, {
-        focusRow: -1,
-        focusCol: -1,
-        visualIndex: 0,
-        actualIndex: 0,
-        gameId: null,
-        displayConfirmation: false,
-        chessStateHistory: [new ChessRules()],
-        playerName: 'Player1',
-        opponentName: 'Player2',
-        myColor: 'White',
-        spectator: true
-      })
+      return def()
     }
 
     case 'RECEIVE_CHESS_GAMES': {
