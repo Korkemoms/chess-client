@@ -83,7 +83,6 @@ class Lobby extends React.Component {
       })
     }
 
-    console.log(myGamesVsSelectedOpponent.length)
     // setup dropdown button for selecting any of my games vs selected player
     let myGamesVsSelectedOpponentButton = myGamesVsSelectedOpponent.length > 0
         ? <DropdownButton
