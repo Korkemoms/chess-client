@@ -34,7 +34,6 @@ cssIcon[bPawn] = '-b_pawn'
  * The squares of the board
  */
 class Square extends React.Component {
-
   shouldComponentUpdate (nextProps, nextState) {
     return nextProps.number !== this.props.number ||
       nextProps.klass !== this.props.klass ||
@@ -82,12 +81,12 @@ class Label extends React.Component {
   }
 }
 
+// TODO define PropTypes
 /**
  * Graphics for a chess board.
  * Purely representational component
  */
 export default class ChessBoard extends React.Component {
-
   render () {
     this.rowLabels = '87654321'
     this.colLabels = 'abcdefgh'
