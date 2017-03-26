@@ -95,21 +95,8 @@ export const selectGame = (game, moves) => dispatch => {
 }
 
 /**
- * @callback myFetchCallback
- * @param {Object} body The response body
- * @param {Object} header The response header
- */
-
-/**
- * @function myFetch
- * @param {string} what The url describing what to fetch
- * @param {Object} props Additional fetch properties
- * @param {myFetchCallback} what Called after successfully fetching resource
-*/
-
-/**
  * @typedef {Object} player
- * @property {string} name
+ * @property {String} name
  */
 
 /**
@@ -154,19 +141,19 @@ export const fetchUpdates = (myFetch, updateIndex) => (dispatch, getState) => {
     method: 'GET',
     headers
   })
-  .then((headers, json) => {
+  .then(({headers, body}) => {
     // dispatch events to update redux store
-    if (json.players.data.length > 0) {
-      dispatch(receivePlayers(json.players.data))
+    if (body.players.data.length > 0) {
+      dispatch(receivePlayers(body.players.data))
     }
-    if (json.chessGames.data.length > 0) {
-      dispatch(receiveChessGames(json.chessGames.data))
+    if (body.chessGames.data.length > 0) {
+      dispatch(receiveChessGames(body.chessGames.data))
     }
-    if (json.chessMoves.data.length > 0) {
-      dispatch(_receiveChessMoves(json.chessMoves.data))
+    if (body.chessMoves.data.length > 0) {
+      dispatch(_receiveChessMoves(body.chessMoves.data))
 
       let movesForSelectedGame = []
-      Object.values(json.chessMoves.data).forEach(move => {
+      Object.values(body.chessMoves.data).forEach(move => {
         if (move.chessGameId === state.selectedGameId) {
           movesForSelectedGame.push(move)
         }
