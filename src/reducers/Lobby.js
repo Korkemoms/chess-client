@@ -1,5 +1,6 @@
 import { PropTypes } from 'react'
 import Lobby from '../components/Lobby'
+import { types } from '../constants/ActionTypes'
 
 /** Define initial Redux state and React PropTypes */
 const def = (props = false) => {
@@ -27,7 +28,7 @@ Lobby.propTypes = def(true)
 
 export default function update (state = initialState, action) {
   switch (action.type) {
-    case 'RECEIVE_PLAYERS': {
+    case types.lobby.RECEIVE_PLAYERS: {
       let current = state.players // its not copied!
       let updated = action.players
 
@@ -52,13 +53,13 @@ export default function update (state = initialState, action) {
       })
     }
 
-    case 'SELECT_TAB' : {
+    case types.lobby.SELECT_TAB : {
       return Object.assign({}, state, {
         selectedTab: action.tab
       })
     }
 
-    case 'RECEIVE_CHESS_GAMES': {
+    case types.lobby.RECEIVE_CHESS_GAMES: {
       let current = state.chessGames // its not copied!
       let updated = action.chessGames
 
@@ -82,7 +83,7 @@ export default function update (state = initialState, action) {
         updateIndex: updateIndex // if there is change the update index will change
       })
     }
-    case 'RECEIVE_CHESS_MOVES': {
+    case types.lobby.RECEIVE_CHESS_MOVES: {
       let local = state.chessMoves // careful, it not copied
 
       // store the moves in one object per chess game
@@ -104,7 +105,7 @@ export default function update (state = initialState, action) {
       })
     }
 
-    case 'SELECT_PLAYER': {
+    case types.lobby.SELECT_PLAYER: {
       let previousSelectedPlayer = state.selectedPlayer
       return Object.assign({}, state, {
         previousSelectedPlayer: previousSelectedPlayer,
@@ -112,16 +113,16 @@ export default function update (state = initialState, action) {
       })
     }
 
-    case 'EXPAND_GAME':
+    case types.lobby.EXPAND_GAME:
       return Object.assign({}, state, {
         expandedGame: action.expandedGame
       })
-    case 'SELECT_GAME':
+    case types.lobby.SELECT_GAME:
       return Object.assign({}, state, {
         selectedGame: action.selectedGame
       })
 
-    case 'APP_RECEIVE_PROPS': {
+    case types.app.APP_RECEIVE_PROPS: {
       return Object.assign({}, state, {
         ...action.props
       })

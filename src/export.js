@@ -7,6 +7,7 @@ import { createStore, applyMiddleware, combineReducers } from 'redux'
 import { Provider } from 'react-redux'
 import chessGameReducer from './reducers/ChessGame'
 import lobbyReducer from './reducers/Lobby'
+import { appReceiveProps } from './actions/App'
 
 import thunkMiddleware from 'redux-thunk'
 import createLogger from 'redux-logger'
@@ -36,25 +37,11 @@ const store = createStore(
 /** Component that can be used in other react projects */
 export default class Chess extends React.Component {
   componentWillMount () {
-    const receiveProps = (props) => {
-      return {
-        type: 'APP_RECEIVE_PROPS',
-        props: props
-      }
-    }
-
-    store.dispatch(receiveProps(this.props))
+    store.dispatch(appReceiveProps(this.props))
   }
 
   componentWillUpdate (nextProps) {
-    const receiveProps = (props) => {
-      return {
-        type: 'APP_RECEIVE_PROPS',
-        props: props
-      }
-    }
-
-    store.dispatch(receiveProps(nextProps))
+    store.dispatch(appReceiveProps(nextProps))
   }
 
   render () {

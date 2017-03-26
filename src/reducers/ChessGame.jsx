@@ -1,6 +1,7 @@
 import ChessRules from '../components/ChessRules'
 import { PropTypes } from 'react'
 import ChessGame from '../components/ChessGame'
+import { types } from '../constants/ActionTypes'
 
 /** Define initial Redux state and React PropTypes */
 const def = (props = false) => {
@@ -12,7 +13,7 @@ const def = (props = false) => {
     actualIndex: f(0, PropTypes.number.isRequired),
     myUid: f(null, PropTypes.string),
     myName: f(null, PropTypes.string),
-    gameId: f(null, PropTypes.number),
+    gameId: f(null, PropTypes.string),
     displayConfirmation: f(false, PropTypes.bool),
     chessStateHistory: f([new ChessRules()], PropTypes.array.isRequired),
     playerName: f('Player1', PropTypes.string.isRequired),
@@ -31,33 +32,33 @@ ChessGame.propTypes = def(true)
 
 const update = (state = initialState, action) => {
   switch (action.type) {
-    case 'SET_FOCUS':
+    case types.chessGame.SET_FOCUS:
       return Object.assign({}, state, {
         focusRow: action.focusRow,
         focusCol: action.focusCol
       })
-    case 'SET_VISUAL_INDEX' :
+    case types.chessGame.SET_VISUAL_INDEX:
       return Object.assign({}, state, {
         visualIndex: action.visualIndex
       })
-    case 'SET_ACTUAL_INDEX' :
+    case types.chessGame.SET_ACTUAL_INDEX:
       return Object.assign({}, state, {
         actualIndex: action.actualIndex
       })
-    case 'SET_DISPLAY_CONFIRMATION' :
+    case types.chessGame.SET_DISPLAY_CONFIRMATION:
       return Object.assign({}, state, {
         displayConfirmation: action.displayConfirmation
       })
-    case 'SET_CHESS_STATE_HISTORY' :
+    case types.chessGame.SET_CHESS_STATE_HISTORY:
       return Object.assign({}, state, {
         chessStateHistory: action.chessStateHistory
       })
-    case 'CLEAR_CHESS_GAME' : {
+    case types.chessGame.CLEAR_CHESS_GAME : {
       // blank game
       return def()
     }
 
-    case 'RECEIVE_CHESS_GAMES': {
+    case types.chessGame.RECEIVE_CHESS_GAMES: {
       let current = state // careful, its not copied
 
       // determine if we receive info about current game (same id)
@@ -98,7 +99,7 @@ const update = (state = initialState, action) => {
       })
     }
 
-    case 'SELECT_GAME': {
+    case types.lobby.SELECT_GAME: {
       // determine some values
       let imChallenger = action.selectedGame.challengerUid === state.myUid
       let playerName = !imChallenger ? action.selectedGame.opponentName
@@ -130,7 +131,7 @@ const update = (state = initialState, action) => {
       })
     }
 
-    case 'APP_RECEIVE_PROPS': {
+    case types.app.APP_RECEIVE_PROPS: {
       return Object.assign({}, state, {
         ...action.props
       })

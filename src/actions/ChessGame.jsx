@@ -1,8 +1,9 @@
 import ChessRules from '../components/ChessRules'
+import { types } from '../constants/ActionTypes'
 
 export const setFocus = (focusRow, focusCol) => {
   return {
-    type: 'SET_FOCUS',
+    type: types.chessGame.SET_FOCUS,
     focusRow: focusRow,
     focusCol: focusCol
   }
@@ -10,47 +11,47 @@ export const setFocus = (focusRow, focusCol) => {
 
 export const setVisualIndex = index => {
   return {
-    type: 'SET_VISUAL_INDEX',
+    type: types.chessGame.SET_VISUAL_INDEX,
     visualIndex: index
   }
 }
 
 export const _sendMove = move => {
   return {
-    type: 'SEND_MOVE',
+    type: types.chessGame.SEND_MOVE,
     move: move
   }
 }
 
 export const setActualIndex = index => {
   return {
-    type: 'SET_ACTUAL_INDEX',
+    type: types.chessGame.SET_ACTUAL_INDEX,
     actualIndex: index
   }
 }
 
 export const setDisplayConfirmation = displayConfirmation => {
   return {
-    type: 'SET_DISPLAY_CONFIRMATION',
+    type: types.chessGame.SET_DISPLAY_CONFIRMATION,
     displayConfirmation: displayConfirmation
   }
 }
 
 export const setChessStateHistory = chessStateHistory => {
   return {
-    type: 'SET_CHESS_STATE_HISTORY',
+    type: types.chessGame.SET_CHESS_STATE_HISTORY,
     chessStateHistory: chessStateHistory
   }
 }
 export const sendMovesFailed = message => {
   return {
-    type: 'SEND_MOVES_FAILED',
+    type: types.chessGame.SEND_MOVES_FAILED,
     message: message
   }
 }
 export const clearChessGame = () => {
   return {
-    type: 'CLEAR_CHESS_GAME'
+    type: types.chessGame.CLEAR_CHESS_GAME
   }
 }
 
