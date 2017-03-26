@@ -70,11 +70,8 @@ cssIcon[bKnight] = '-b_knight'
 cssIcon[bPawn] = '-b_pawn'
 
 class ChessGame extends React.Component {
-
-  /**
-   * Starts interval calls of the function props.onInterval
-   */
   componentWillMount () {
+    // start interval calls of the function props.onInterval
     const _this = this
 
     // update visualIndex if slider has been moved
@@ -92,10 +89,8 @@ class ChessGame extends React.Component {
     }, 100)
   }
 
-  /**
-   * Stops interval updates
-   */
   componentWillUnmount () {
+    // Stops interval updates
     window.clearInterval(this.timerId)
   }
 
@@ -127,25 +122,15 @@ class ChessGame extends React.Component {
   }
 
   render () {
-    // gather some info
-
-    // const playerName = this.props.playerName
-    // const opponentName = this.props.opponentName
     const chessStateHistory = this.props.chessStateHistory
     const visualIndex = this.props.visualIndex
-    // const chessState = chessStateHistory[visualIndex]
-    // const focusRow = this.props.focusRow
-    // const focusCol = this.props.focusCol
-    // const gotFocus = focusRow !== -1 && focusCol !== -1
-    const imWhite = this.props.myColor === 'White'
-    // const rotate = !imWhite
-    // const lastMove = chessState.moves.length > 0
-    //   ? chessState.moves[chessState.moves.length - 1] : null
+    const imWhite = this.props.playerUid === this.props.whitePlayerUid
 
     const actualIndex = this.props.actualIndex
     const actuallyMyTurn = (imWhite && actualIndex % 2 === 0) ||
       (!imWhite && actualIndex % 2 !== 0) ||
-      this.props.playerUid === this.props.opponentUid
+      (this.props.playerUid === this.props.whitePlayerUid &&
+        this.props.playerUid === this.props.blackPlayerUid)
 
     const canConfirmMove = actuallyMyTurn && visualIndex === actualIndex + 1 &&
      this.props.gameId && this.props.gameId !== null && !this.props.spectator
@@ -162,10 +147,10 @@ class ChessGame extends React.Component {
           focusRow={this.props.focusRow}
           focusCol={this.props.focusCol}
           displayConfirmation={this.props.displayConfirmation}
-          opponentName={this.props.opponentName}
-          playerName={this.props.playerName}
+          opponentName={this.props.blackPlayerName}
+          playerName={this.props.whitePlayerName}
           onClick={(row, col) => this.props.handleClick(row, col)}
-          myColor={this.props.myColor}
+          myColor={(this.props.spectator || imWhite) ? 'White' : 'Black'}
         />
 
         <div className={'Player-bar-bottom'}>
