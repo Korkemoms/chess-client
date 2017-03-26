@@ -204,6 +204,7 @@ export const moveMany = (moves, actual) => (dispatch, getState) => {
   if (moves.length === 0) return
 
   let state = getState().chessGame
+    let somethingHappened = false
 
   let index = actual ? state.actualIndex : state.visualIndex
   let chessState = state.chessStateHistory[index]
@@ -213,6 +214,7 @@ export const moveMany = (moves, actual) => (dispatch, getState) => {
   let lastMoveNumber = chessState.moves.length > 0
   ? chessState.moves[chessState.moves.length - 1].number : 0
 
+
   moves = moves.sort((a, b) => a.number - b.number)
   moves.forEach(function (move) {
     let number = Number(move.number)
@@ -221,18 +223,21 @@ export const moveMany = (moves, actual) => (dispatch, getState) => {
       newHistory.push(chessState)
       index++
       lastMoveNumber++
+      somethingHappened = true
     } else {
-      throw Error(`Wrong move number. Actual:${number} Expected:${lastMoveNumber + 1}`)
+      console.log(`Ignoring move: Wrong move number. Actual:${number} Expected:${lastMoveNumber + 1}`)
     }
   })
 
   // update components
-  dispatch(setChessStateHistory(newHistory))
-  dispatch(setVisualIndex(index))
-  if (actual) {
-    dispatch(setActualIndex(index))
+  if (somethingHappened) {
+    dispatch(setChessStateHistory(newHistory))
+    dispatch(setVisualIndex(index))
+    if (actual) {
+      dispatch(setActualIndex(index))
+    }
+    dispatch(setFocus(-1, -1))
   }
-  dispatch(setFocus(-1, -1))
 
   return chessState
 }
@@ -300,17 +305,18 @@ export const move = (fromRow, fromCol, toRow, toCol, number,
 export const sendMove = (move, callback) => (dispatch, getState) => {
   dispatch(_sendMove(move))
 
-  let form = new FormData()
-  form.append('from_row', move.fromRow)
-  form.append('from_col', move.fromCol)
-  form.append('to_row', move.toRow)
-  form.append('to_col', move.toCol)
-  form.append('number', move.number)
-  form.append('chess_game_id', move.chessGameId)
+  let body = {
+    'from_row': move.fromRow,
+    'from_col': move.fromCol,
+    'to_row': move.toRow,
+    'to_col': move.toCol,
+    'number': move.number,
+    'chess_game_id': move.chessGameId
+  }
 
   return getState().chessGame.myFetch('/chess-moves', {
     method: 'POST',
-    body: form
+    body: JSON.stringify(body)
   }, callback)
   .catch(error => { // handle errors
     dispatch(sendMovesFailed('Something went wrong: ' + error))
