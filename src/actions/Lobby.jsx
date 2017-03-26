@@ -18,7 +18,7 @@ export const receiveChessGames = chessGames => {
     chessGames: chessGames.slice()
   }
 }
-export const _receiveChessMoves = chessMoves => {
+export const receiveChessMoves = chessMoves => {
   return {
     type: types.lobby.RECEIVE_CHESS_MOVES,
     chessMoves: chessMoves.slice()
@@ -96,11 +96,6 @@ export const selectGame = (game, moves) => dispatch => {
 }
 
 /**
- * @typedef {Object} player
- * @property {String} name
- */
-
-/**
  * Send a challenge to the server.
  * @param {myFetch} myFetch custom fetch
  * @param {player} player Player to challenge
@@ -110,15 +105,16 @@ export const challengePlayer = (myFetch, me, player) => dispatch => {
   console.log(me, player)
   dispatch(_challengePlayer(player))
 
-  var form = new FormData()
-  form.append('challenger_uid', me.uid)
-  form.append('opponent_uid', player.uid)
-  form.append('challenger_name', me.name)
-  form.append('opponent_name', player.name)
+  var body = {
+    white_player_uid: me.uid,
+    black_player_uid: player.uid,
+    white_player_name: me.name,
+    black_player_name: player.name
+  }
 
   return myFetch('/chess-games', {
     method: 'POST',
-    body: form
+    body: JSON.stringify(body)
   })
   .catch(error => { // handle errors
     dispatch(challengePlayerFailed('Something went wrong: ' + error))
@@ -151,11 +147,11 @@ export const fetchUpdates = (myFetch, updateIndex) => (dispatch, getState) => {
       dispatch(receiveChessGames(body.chessGames.data))
     }
     if (body.chessMoves.data.length > 0) {
-      dispatch(_receiveChessMoves(body.chessMoves.data))
+      dispatch(receiveChessMoves(body.chessMoves.data))
 
       let movesForSelectedGame = []
       Object.values(body.chessMoves.data).forEach(move => {
-        if (move.chessGameId === state.selectedGameId) {
+        if (state.selectedGame && move.chessGameId === state.selectedGame.id) {
           movesForSelectedGame.push(move)
         }
       })
