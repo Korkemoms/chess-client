@@ -31,8 +31,8 @@ class Lobby extends React.Component {
       }
 
       let props = _this.props
-      let loggedIn = props.myName !== null &&
-        props.myUid !== null && props.myFetch !== null
+      let loggedIn = props.playerName !== null &&
+        props.playerUid !== null && props.myFetch !== null
       if (!loggedIn) {
         return
       }
@@ -49,11 +49,11 @@ class Lobby extends React.Component {
   playerTab () {
     // button to challenge selected player
     let challengeButton =
-      <Button disabled={this.props.selectedPlayerUid === null}
+      <Button disabled={this.props.selectedPlayer === null}
         bsStyle='primary'
         onClick={() => this.props.challengePlayer(
           this.props.myFetch,
-          {uid: this.props.myUid, name: this.props.myName},
+          {uid: this.props.playerUid, name: this.props.playerName},
           this.props.selectedPlayer)}>
             Challenge
       </Button>
@@ -65,15 +65,15 @@ class Lobby extends React.Component {
         let p = this.props
         let sel = this.props.selectedPlayer
 
-        let myGame = game.challengerUid === p.myUid ||
-              game.opponentUid === p.myUid
+        let myGame = game.whitePlayerUid === p.playerUid ||
+              game.blackPlayerUid === p.playerUid
 
         let selectedOpponentsGame =
-              game.challengerUid === sel.uid ||
-              game.opponentUid === sel.uid
+              game.whitePlayerUid === sel.uid ||
+              game.blackPlayerUid === sel.uid
 
-        let selectedMyself = sel.uid === p.myUid
-        let vsItself = game.challengerUid === game.opponentUid
+        let selectedMyself = sel.uid === p.playerUid
+        let vsItself = game.whitePlayerUid === game.blackPlayerUid
 
         let addGame = selectedMyself && vsItself && myGame
         addGame |= !selectedMyself && myGame && selectedOpponentsGame
@@ -90,17 +90,17 @@ class Lobby extends React.Component {
           bsStyle='success'
           title='Games'>
           {myGamesVsSelectedOpponent.map((game, index) => {
-            let moves = game.id in this.props.chessMoves ?
-            Object.values(this.props.chessMoves[game.id]) : []
+            let moves = game.id in this.props.chessMoves
+            ? Object.values(this.props.chessMoves[game.id]) : []
 
             // there may be duplicate moves (with same move.number)
             // (for any move.number only the one with the lowest move.id is )
             // TODO I will remove duplicate moves soon
             let moveCount = moves.length > 0 ? moves[moves.length - 1].number : 0
 
-            let imWhite = game.challengerUid === this.props.myUid
-            let myTurn = imWhite && moves % 2 === 0
-
+            let imWhite = game.whitePlayerUid === this.props.playerUid
+            let myTurn = (imWhite && moves % 2 === 0) ||
+              (!imWhite && moves % 2 === 1)
             return (
               <MenuItem
                 active={game.id === this.props.selectedGameId}
@@ -122,12 +122,12 @@ class Lobby extends React.Component {
       this.props.chessGames.forEach(game => {
         let prev = this.props.previousSelectedPlayer
 
-        let myGame = game.challengerUid === this.props.myUid ||
-                     game.opponentUid === this.props.myUid
+        let myGame = game.whitePlayerUid === this.props.playerUid ||
+                     game.blackPlayerUid === this.props.playerUid
 
         let previouslySelectedOpponentsGame = prev &&
-          (game.challengerUid === prev.uid ||
-          game.opponentUid === prev.uid)
+          (game.whitePlayerUid === prev.uid ||
+          game.blackPlayerUid === prev.uid)
 
         if (myGame && previouslySelectedOpponentsGame) {
           myGamesVsPreviousSelectedOpponent.push(game)
@@ -147,7 +147,8 @@ class Lobby extends React.Component {
             ? this.props.selectedPlayer.uid : null}
           accordion >
           {this.props.players.map((player, index) => {
-            let boldPlayerName = player.uid === this.props.myUid
+            let boldPlayerName = this.props.player &&
+              player.uid === this.props.playerUid
             let headerText = boldPlayerName
                 ? <strong>{player.name}</strong>
                 : player.name
@@ -184,28 +185,28 @@ class Lobby extends React.Component {
       // prepare button
       let showGameButton =
         <Button
-          active={this.props.selectedGame
-            && this.props.selectedGame.id === chessGame.id}
+          active={this.props.selectedGame &&
+            this.props.selectedGame.id === chessGame.id}
           bsStyle='primary'
           onClick={() => {
             let moves = chessGame.id in this.props.chessMoves
             ? Object.values(this.props.chessMoves[chessGame.id]) : []
             this.props.selectGame(chessGame, moves)
           }} >
-          {this.props.myUid === chessGame.challengerUid ||
-                this.props.myUid === chessGame.opponentUid
+          {this.props.playerUid === chessGame.whitePlayerUid ||
+                this.props.playerUid === chessGame.blackPlayerUid
                     ? 'Show game' : 'Spectate'}
         </Button>
 
       // prepare text
-      let boldChallengerName = chessGame.challengerUid === this.props.myUid
-      let boldOpponentName = chessGame.opponentUid === this.props.myUid
+      let boldChallengerName = chessGame.whitePlayerUid === this.props.playerUid
+      let boldOpponentName = chessGame.blackPlayerUid === this.props.playerUid
       let challengerName = boldChallengerName
-            ? <strong>{chessGame.challengerName}</strong>
-            : chessGame.challengerName
+            ? <strong>{chessGame.whitePlayerName}</strong>
+            : chessGame.whitePlayerName
       let opponentName = boldOpponentName
-            ? <strong>{chessGame.opponentName}</strong>
-            : chessGame.opponentName
+            ? <strong>{chessGame.blackPlayerName}</strong>
+            : chessGame.blackPlayerName
       let headerText = <div>{challengerName}{' vs '}{opponentName}</div>
 
       // one panel for each game
@@ -245,8 +246,8 @@ class Lobby extends React.Component {
   }
 
   render () {
-    let loggedIn = this.props.myName !== null &&
-      this.props.myUid !== null &&
+    let loggedIn = this.props.playerName !== null &&
+      this.props.playerUid !== null &&
       this.props.myFetch !== null
 
     if (!loggedIn) {

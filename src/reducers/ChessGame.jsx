@@ -11,19 +11,21 @@ const def = (props = false) => {
     focusCol: f(-1, PropTypes.number.isRequired),
     visualIndex: f(0, PropTypes.number.isRequired),
     actualIndex: f(0, PropTypes.number.isRequired),
-    myUid: f(null, PropTypes.string),
-    myName: f(null, PropTypes.string),
     gameId: f(null, PropTypes.string),
     displayConfirmation: f(false, PropTypes.bool),
     chessStateHistory: f([new ChessRules()], PropTypes.array.isRequired),
-    playerName: f('Player1', PropTypes.string.isRequired),
-    opponentName: f('Player2', PropTypes.string.isRequired),
+    whitePlayerUid: f(null, PropTypes.string),
+    whitePlayerName: f('Player1', PropTypes.string.isRequired),
+    blackPlayerUid: f(null, PropTypes.string),
+    blackPlayerName: f('Player2', PropTypes.string.isRequired),
+    playerUid: f(null, PropTypes.string),
+    playerName: f(null, PropTypes.string),
     myColor: f('White', PropTypes.string.isRequired),
-    spectator: f(true, PropTypes.bool)
-
+    spectator: f(true, PropTypes.bool),
+    myFetch: f(null, PropTypes.func)
   }
   if (props) { // add more React PropTypes
-    r = { ...r}
+    r = {...r}
   }
   return r
 }
@@ -54,17 +56,23 @@ const update = (state = initialState, action) => {
         chessStateHistory: action.chessStateHistory
       })
     case types.chessGame.CLEAR_CHESS_GAME : {
-      // blank game
-      return def()
+      // reset most of the state
+      let playerName = state.playerName
+      let playerUid = state.playerUid
+      let myFetch = state.myFetch
+
+      return {
+        ...def(),
+        playerName,
+        playerUid,
+        myFetch
+      }
     }
-
     case types.chessGame.RECEIVE_CHESS_GAMES: {
-      let current = state // careful, its not copied
-
       // determine if we receive info about current game (same id)
       let received
       Object.values(action.chessGames).forEach(game => {
-        if (game.id === current.gameId) {
+        if (game.id === state.gameId) {
           received = game
         }
       })
@@ -73,45 +81,25 @@ const update = (state = initialState, action) => {
         return Object.assign({}, state)
       }
 
-      // we received info about current game
+      let spectator = received.whitePlayerUid !== state.playerUid &&
+        received.blackPlayerUid !== state.playerUid
 
-      // determine some values
-      let imChallenger = received.challengerUid === state.myUid
-      let playerName = !imChallenger ? received.opponentName
-      : received.challengerName
-      let playerUid = !imChallenger ? received.opponentUid
-      : received.challengerUid
-      let opponentName = imChallenger ? received.opponentName
-      : received.challengerName
-      let opponentUid = imChallenger ? received.opponentUid
-      : received.challengerUid
-      let spectator = opponentUid !== state.myUid && playerUid !== state.myUid
-
-      // copy info received into current game
+      // update current game
       return Object.assign({}, state, {
-        playerName: playerName,
-        playerUid: playerUid,
-        opponentName: opponentName,
-        opponentUid: opponentUid,
+        whitePlayerName: received.whitePlayerName,
+        whitePlayerUid: received.whitePlayerUid,
+        blackPlayerName: received.blackPlayerName,
+        blackPlayerUid: received.blackPlayerUid,
         displayConfirmation: false,
-        myColor: imChallenger ? 'White' : 'Black',
         spectator: spectator
       })
     }
-
     case types.lobby.SELECT_GAME: {
       // determine some values
-      let imChallenger = action.selectedGame.challengerUid === state.myUid
-      let playerName = !imChallenger ? action.selectedGame.opponentName
-        : action.selectedGame.challengerName
-      let playerUid = !imChallenger ? action.selectedGame.opponentUid
-          : action.selectedGame.challengerUid
-      let opponentName = imChallenger ? action.selectedGame.opponentName
-        : action.selectedGame.challengerName
-      let opponentUid = imChallenger ? action.selectedGame.opponentUid
-          : action.selectedGame.challengerUid
-      let spectator = opponentUid !== state.myUid &&
-        playerUid !== state.myUid
+
+      let selectedGame = action.selectedGame
+      let spectator = selectedGame.whitePlayerUid !== state.playerUid &&
+        selectedGame.blackPlayerUid !== state.playerUid
 
       // new game
       return Object.assign({}, state, {
@@ -119,14 +107,13 @@ const update = (state = initialState, action) => {
         focusCol: -1,
         visualIndex: 0,
         actualIndex: 0,
-        playerName: playerName,
-        playerUid: playerUid,
-        opponentName: opponentName,
-        opponentUid: opponentUid,
         chessStateHistory: [new ChessRules()],
         gameId: action.selectedGame.id,
+        whitePlayerName: selectedGame.whitePlayerName,
+        whitePlayerUid: selectedGame.whitePlayerUid,
+        blackPlayerName: selectedGame.blackPlayerName,
+        blackPlayerUid: selectedGame.blackPlayerUid,
         displayConfirmation: false,
-        myColor: imChallenger ? 'White' : 'Black',
         spectator: spectator
       })
     }
