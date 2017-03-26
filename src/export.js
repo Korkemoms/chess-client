@@ -67,6 +67,7 @@ export default class Chess extends React.Component {
 
 Chess.propTypes = {
   myFetch: PropTypes.func,
-  myUid: PropTypes.string,
-  myName: PropTypes.string
+  playerUid: PropTypes.string,
+  playerName: PropTypes.string,
+  navigate: PropTypes.func
 }
