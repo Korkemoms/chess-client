@@ -204,7 +204,7 @@ export const moveMany = (moves, actual) => (dispatch, getState) => {
   if (moves.length === 0) return
 
   let state = getState().chessGame
-    let somethingHappened = false
+  let somethingHappened = false
 
   let index = actual ? state.actualIndex : state.visualIndex
   let chessState = state.chessStateHistory[index]
@@ -213,7 +213,6 @@ export const moveMany = (moves, actual) => (dispatch, getState) => {
   // add new chess rule states to history
   let lastMoveNumber = chessState.moves.length > 0
   ? chessState.moves[chessState.moves.length - 1].number : 0
-
 
   moves = moves.sort((a, b) => a.number - b.number)
   moves.forEach(function (move) {
