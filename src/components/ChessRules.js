@@ -1,5 +1,8 @@
-// const rowLabels = '87654321';
-// const colLabels = 'abcdefgh';
+// const index->rowLabels = '01234567'->'87654321';
+// const index->colLabels = '01234567'->'abcdefgh';
+
+// TODO limit move history length? (need only length two to implement en passant)
+// TODO Use Immutable.js?
 
 // unicode symbols
 const wKing = '\u2654'
@@ -16,11 +19,12 @@ const bBishop = '\u265D'
 const bKnight = '\u265E'
 const bPawn = '\u265F'
 
+/** Should be treated as immutable */
 class Piece {
   constructor (unicode, color, moves) {
     this.unicode = unicode
     this.color = color
-    this.moves = moves
+    this.moves = moves // the number of times 'this' piece has been moved
   }
 
   copy () {
@@ -31,15 +35,18 @@ class Piece {
     return this.unicode === ''
   }
 }
+
+/** The empty squares has a copy of this piece */
 const emptyPiece = new Piece('', '', 0)
 
+/** Should be treated as immutable */
 class Move {
   constructor (fromRow, fromCol, targetRow, targetCol, number) {
     this.fromRow = fromRow
     this.fromCol = fromCol
     this.toRow = targetRow
     this.toCol = targetCol
-    this.number = number
+    this.number = number // first move in a game is 1, next is 2 etc...
   }
 
   copy () {
@@ -48,11 +55,11 @@ class Move {
   }
 }
 
-// TODO limit history length? (need only length two to implement castling)
 /**
- *
- * Chess rules, has a history in order to implement come rules.
+ * Chess rules, has a history in order to implement some rules.
  * White starts bottom (row 6 and 7)
+ *
+ * Should be treated as immutable
  */
 export default class ChessRules {
   constructor () {
@@ -135,6 +142,7 @@ export default class ChessRules {
     return gameState
   }
 
+  /** Get all the dead pieces so far with given color. */
   getDeadPieces (color) {
     const dead = []
     for (let i = 0; i < this.deadPieces.length; i++) {
@@ -144,7 +152,7 @@ export default class ChessRules {
     }
     return dead
   }
-
+  /** Get the piece at this square, see top of doc for translation of index to labels */
   getPiece (row, col) {
     if (row < 0 || row > 7) throw new Error('Illegal row: ' + row)
     if (col < 0 || col > 7) throw new Error('Illegal column: ' + col)
@@ -152,10 +160,12 @@ export default class ChessRules {
     return this.pieces[col + (row * 8)]
   }
 
-/**
- * Move a piece, returns a new ChessRules
- * assumes it is a valid move, see canMove(row,col,targetRow,targetCol)
- */
+  /**
+   * Move a piece, returns a new ChessRules
+   * assumes it is a valid move, see canMove(row,col,targetRow,targetCol)
+   *
+   * @returns a copy of this ChessRules where the given move has been performed
+   */
   move (row, col, targetRow, targetCol) {
     row = Number(row)
     col = Number(col)
@@ -210,9 +220,13 @@ export default class ChessRules {
     return newState
   }
 
-  // move a piece, returns a new ChessRules
-  // does not account for special behavior (en passant and castling)
-  // assumes it is a valid move otherwise, see canMove(row,col,targetRow,targetCol)
+  /**
+   * Move a piece, returns a new ChessRules
+   * does not account for special behavior (en passant and castling)
+   * assumes it is a valid move otherwise, see canMove(row,col,targetRow,targetCol)
+   *
+   * @returns a copy of this ChessRules where the given move has been performed
+   */
   basicMove (row, col, targetRow, targetCol) {
     const newState = this.copy()
 
@@ -237,7 +251,9 @@ export default class ChessRules {
     return newState
   }
 
-  // whether Black king is in check
+  /**
+   * @returns whether Black king is in check
+   */
   blackCheck () {
     // determine where Black king is
     let BlackKingRow = 0
@@ -267,7 +283,9 @@ export default class ChessRules {
     return false
   }
 
-  // whether White king is in check
+  /**
+   * @returns whether White king is in check
+   */
   whiteCheck () {
     // determine where White king is
     let WhiteKingRow = 0
@@ -297,7 +315,10 @@ export default class ChessRules {
     return false
   }
 
-  // also covers check, en passant and castling
+  /**
+   * Also covers check, en passant and castling
+   * @returns whether given move is allowed
+   */
   canMove (row, col, targetRow, targetCol) {
     if (row < 0 || row > 7) throw new Error('Illegal row: ' + row)
     if (col < 0 || col > 7) throw new Error('Illegal column: ' + col)
@@ -327,6 +348,9 @@ export default class ChessRules {
     return true
   }
 
+  /**
+   * @returns whether given move is a castling move and is allowed
+   */
   canCastling (row, col, targetRow, targetCol) {
     function castlingRules (state, row, col, targetRow, targetCol) {
       if (row < 0 || row > 7) throw new Error('Illegal row: ' + row)
@@ -396,6 +420,9 @@ export default class ChessRules {
     return false
   }
 
+  /**
+   * @returns whether given move is a en passant move and is allowed
+   */
   canEnPassant (row, col, targetRow, targetCol) {
     if (row < 0 || row > 7) throw new Error('Illegal row: ' + row)
     if (col < 0 || col > 7) throw new Error('Illegal column: ' + col)
@@ -462,7 +489,10 @@ export default class ChessRules {
     return false
   }
 
-  // only covers basic movements, does not care whose turn it is
+  /**
+   * only covers basic movements, does not care whose turn it is
+   * @returns whether given move is allowed
+   */
   basicCanMove (row, col, targetRow, targetCol) {
     if (row < 0 || row > 7) throw new Error('Illegal row: ' + row)
     if (col < 0 || col > 7) throw new Error('Illegal column: ' + col)
