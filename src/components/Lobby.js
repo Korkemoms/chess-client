@@ -120,16 +120,22 @@ class Lobby extends React.Component {
     let myGamesVsPreviousSelectedOpponent = []
     if (this.props.previousSelectedPlayer) {
       this.props.chessGames.forEach(game => {
-        let prev = this.props.previousSelectedPlayer
+        let p = this.props
+        let sel = this.props.previousSelectedPlayer
 
-        let myGame = game.whitePlayerUid === this.props.playerUid ||
-                     game.blackPlayerUid === this.props.playerUid
+        let myGame = game.whitePlayerUid === p.playerUid ||
+              game.blackPlayerUid === p.playerUid
 
-        let previouslySelectedOpponentsGame = prev &&
-          (game.whitePlayerUid === prev.uid ||
-          game.blackPlayerUid === prev.uid)
+        let selectedOpponentsGame =
+              game.whitePlayerUid === sel.uid ||
+              game.blackPlayerUid === sel.uid
 
-        if (myGame && previouslySelectedOpponentsGame) {
+        let selectedMyself = sel.uid === p.playerUid
+        let vsItself = game.whitePlayerUid === game.blackPlayerUid
+
+        let addGame = selectedMyself && vsItself && myGame
+        addGame |= !selectedMyself && myGame && selectedOpponentsGame
+        if (addGame) {
           myGamesVsPreviousSelectedOpponent.push(game)
         }
       })
