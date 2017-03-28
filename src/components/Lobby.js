@@ -116,7 +116,7 @@ class Lobby extends React.Component {
         : null
 
     // dropdown button that does nothing, its just there to
-    // look pretty during transitioning to another tab
+    // look pretty during transitioning to another player
     let myGamesVsPreviousSelectedOpponent = []
     if (this.props.previousSelectedPlayer) {
       this.props.chessGames.forEach(game => {
