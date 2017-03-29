@@ -14,9 +14,10 @@ const def = (props = false) => {
     playerName: f(null, PropTypes.string),
     selectedGame: f(null, PropTypes.object),
     selectedPlayer: f(null, PropTypes.object),
+    previousSelectedPlayer: f(null, PropTypes.object),
     expandedGame: f(null, PropTypes.object),
+    previousExpandedGame: f(null, PropTypes.object),
     selectedTab: f('players', PropTypes.string.isRequired)
-
   }
   if (props) { // add more React PropTypes
     r = {myFetch: PropTypes.func, ...r}
@@ -108,15 +109,18 @@ export default function update (state = initialState, action) {
     case types.lobby.SELECT_PLAYER(): {
       let previousSelectedPlayer = state.selectedPlayer
       return Object.assign({}, state, {
-        previousSelectedPlayer: previousSelectedPlayer,
+        previousSelectedPlayer,
         selectedPlayer: action.selectedPlayer
       })
     }
 
-    case types.lobby.EXPAND_GAME():
+    case types.lobby.EXPAND_GAME(): {
+      let previousExpandedGame = state.expandedGame
       return Object.assign({}, state, {
-        expandedGame: action.expandedGame
+        expandedGame: action.expandedGame,
+        previousExpandedGame
       })
+    }
     case types.lobby.SELECT_GAME():
       return Object.assign({}, state, {
         selectedGame: action.selectedGame

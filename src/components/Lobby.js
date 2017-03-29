@@ -47,23 +47,34 @@ class Lobby extends React.Component {
   }
 
   playerTab () {
+    let selectedPlayer = this.props.selectedPlayer
+    let previousSelectedPlayer = this.props.previousSelectedPlayer
+
     // button to challenge selected player
     let challengeButton =
-      <Button disabled={this.props.selectedPlayer === null}
+      <Button disabled={selectedPlayer === null}
         bsStyle='primary'
         onClick={() => this.props.challengePlayer(
           this.props.myFetch,
           {uid: this.props.playerUid, name: this.props.playerName},
-          this.props.selectedPlayer)}>
+          selectedPlayer)}>
             Challenge
       </Button>
 
+    // additional info about selected player
+    let selectedPlayerInfo = selectedPlayer
+    ? <div><label>Id:</label> {selectedPlayer.uid}</div>
+    : null
+    let previousSelectedPlayerInfo = previousSelectedPlayer
+    ? <div><label>Id:</label> {previousSelectedPlayer.uid}</div>
+    : null
+
     // prepare entries for dropdown button displaying my games vs selected player
     let myGamesVsSelectedOpponent = []
-    if (this.props.selectedPlayer) {
+    if (selectedPlayer) {
       this.props.chessGames.forEach(game => {
         let p = this.props
-        let sel = this.props.selectedPlayer
+        let sel = selectedPlayer
 
         let myGame = game.whitePlayerUid === p.playerUid ||
               game.blackPlayerUid === p.playerUid
@@ -89,6 +100,9 @@ class Lobby extends React.Component {
           id={`games-vs-selected-player-dropdown`}
           bsStyle='success'
           title='Games'>
+          <MenuItem disabled key={-1}><strong style={{color: 'black'}}>
+            {`My games vs ${selectedPlayer.name}:`}
+          </strong ></MenuItem>
           {myGamesVsSelectedOpponent.map((game, index) => {
             let moves = game.id in this.props.chessMoves
             ? Object.values(this.props.chessMoves[game.id]) : []
@@ -118,10 +132,10 @@ class Lobby extends React.Component {
     // dropdown button that does nothing, its just there to
     // look pretty during transitioning to another player
     let myGamesVsPreviousSelectedOpponent = []
-    if (this.props.previousSelectedPlayer) {
+    if (previousSelectedPlayer) {
       this.props.chessGames.forEach(game => {
         let p = this.props
-        let sel = this.props.previousSelectedPlayer
+        let sel = previousSelectedPlayer
 
         let myGame = game.whitePlayerUid === p.playerUid ||
               game.blackPlayerUid === p.playerUid
@@ -149,24 +163,35 @@ class Lobby extends React.Component {
     // prepare all player tabs
     return (
       <Tab.Pane eventKey='players'>
-        <PanelGroup activeKey={this.props.selectedPlayer
-            ? this.props.selectedPlayer.uid : null}
+        <PanelGroup activeKey={selectedPlayer
+            ? selectedPlayer.uid : null}
           accordion >
           {this.props.players.map((player, index) => {
-            let boldPlayerName = this.props.player &&
+            // playername
+            let boldPlayerName = this.props.playerUid &&
               player.uid === this.props.playerUid
             let headerText = boldPlayerName
                 ? <strong>{player.name}</strong>
                 : player.name
 
+            // button to select games vs this opponent
             let gamesButton
-            if (this.props.selectedPlayer &&
-                this.props.selectedPlayer.uid === player.uid) {
+            if (selectedPlayer && selectedPlayer.uid === player.uid) {
               gamesButton = myGamesVsSelectedOpponentButton
-            } else if (this.props.previousSelectedPlayer &&
-              this.props.previousSelectedPlayer.uid === player.uid) {
+            } else if (previousSelectedPlayer &&
+              previousSelectedPlayer.uid === player.uid) {
               gamesButton = myGamesVsPreviouslySelectedOpponentButton
             }
+
+            // more info
+            let moreInfo
+            if (selectedPlayer && selectedPlayer.uid === player.uid) {
+              moreInfo = selectedPlayerInfo
+            } else if (previousSelectedPlayer &&
+              previousSelectedPlayer.uid === player.uid) {
+              moreInfo = previousSelectedPlayerInfo
+            }
+
             return (
               <Panel
                 header={headerText}
@@ -177,6 +202,7 @@ class Lobby extends React.Component {
                   {challengeButton}
                   {gamesButton}
                 </ButtonToolbar>
+                {moreInfo}
               </Panel>
             )
           }
@@ -187,12 +213,36 @@ class Lobby extends React.Component {
   }
 
   gamesTab () {
+    let selectedGame = this.props.selectedGame
+    let expandedGame = this.props.expandedGame
+    let previousExpandedGame = this.props.previousExpandedGame
+
+    // additional info
+    let expandedGameInfo = expandedGame
+    ? <div>
+      <label>Game id:</label> {expandedGame.id}<br />
+      <label>White</label> {`${expandedGame.whitePlayerName}
+        (${expandedGame.whitePlayerUid})`}<br />
+      <label>Black</label> {`${expandedGame.blackPlayerName}
+        (${expandedGame.blackPlayerUid})`}<br />
+    </div>
+      : null
+
+    let previousExpandedGameInfo = previousExpandedGame
+      ? <div>
+        <label>Game id:</label> {previousExpandedGame.id}<br />
+        <label>White</label> {`${previousExpandedGame.whitePlayerName}
+          (${previousExpandedGame.whitePlayerUid})`}<br />
+        <label>Black</label> {`${previousExpandedGame.blackPlayerName}
+          (${previousExpandedGame.blackPlayerUid})`}<br />
+      </div>
+        : null
+
     let panels = this.props.chessGames.map((chessGame, index) => {
-      // prepare button
+      // main button
       let showGameButton =
         <Button
-          active={this.props.selectedGame &&
-            this.props.selectedGame.id === chessGame.id}
+          active={selectedGame && selectedGame.id === chessGame.id}
           bsStyle='primary'
           onClick={() => {
             let moves = chessGame.id in this.props.chessMoves
@@ -204,7 +254,15 @@ class Lobby extends React.Component {
                     ? 'Show game' : 'Spectate'}
         </Button>
 
-      // prepare text
+      // more info
+      let moreInfo
+      if (expandedGame && expandedGame.id === chessGame.id) {
+        moreInfo = expandedGameInfo
+      } else if (previousExpandedGame && previousExpandedGame.id === chessGame.id) {
+        moreInfo = previousExpandedGameInfo
+      }
+
+      // header text
       let boldChallengerName = chessGame.whitePlayerUid === this.props.playerUid
       let boldOpponentName = chessGame.blackPlayerUid === this.props.playerUid
       let challengerName = boldChallengerName
@@ -221,14 +279,14 @@ class Lobby extends React.Component {
         key={index}
         eventKey={chessGame.id}
         onClick={() => this.props.expandGame(chessGame)}>
-        {showGameButton}
+        <ButtonToolbar>{showGameButton}</ButtonToolbar>
+        {moreInfo}
       </Panel>)
     })
 
     return (
       <Tab.Pane eventKey='games'>
-        <PanelGroup activeKey={this.props.expandedGame
-            ? this.props.expandedGame.id : null}
+        <PanelGroup activeKey={expandedGame ? expandedGame.id : null}
           accordion>
           {panels}
         </PanelGroup>
