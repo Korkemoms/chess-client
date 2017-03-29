@@ -34,28 +34,28 @@ ChessGame.propTypes = def(true)
 
 const update = (state = initialState, action) => {
   switch (action.type) {
-    case types.chessGame.SET_FOCUS:
+    case types.chessGame.SET_FOCUS():
       return Object.assign({}, state, {
         focusRow: action.focusRow,
         focusCol: action.focusCol
       })
-    case types.chessGame.SET_VISUAL_INDEX:
+    case types.chessGame.SET_VISUAL_INDEX():
       return Object.assign({}, state, {
         visualIndex: action.visualIndex
       })
-    case types.chessGame.SET_ACTUAL_INDEX:
+    case types.chessGame.SET_ACTUAL_INDEX():
       return Object.assign({}, state, {
         actualIndex: action.actualIndex
       })
-    case types.chessGame.SET_DISPLAY_CONFIRMATION:
+    case types.chessGame.SET_DISPLAY_CONFIRMATION():
       return Object.assign({}, state, {
         displayConfirmation: action.displayConfirmation
       })
-    case types.chessGame.SET_CHESS_STATE_HISTORY:
+    case types.chessGame.SET_CHESS_STATE_HISTORY():
       return Object.assign({}, state, {
         chessStateHistory: action.chessStateHistory
       })
-    case types.chessGame.CLEAR_CHESS_GAME : {
+    case types.chessGame.CLEAR_CHESS_GAME(): {
       // reset most of the state
       let playerName = state.playerName
       let playerUid = state.playerUid
@@ -68,7 +68,7 @@ const update = (state = initialState, action) => {
         myFetch
       }
     }
-    case types.chessGame.RECEIVE_CHESS_GAMES: {
+    case types.lobby.RECEIVE_CHESS_GAMES(): {
       // determine if we receive info about current game (same id)
       let received
       Object.values(action.chessGames).forEach(game => {
@@ -94,7 +94,7 @@ const update = (state = initialState, action) => {
         spectator: spectator
       })
     }
-    case types.lobby.SELECT_GAME: {
+    case types.lobby.SELECT_GAME(): {
       // determine some values
 
       let selectedGame = action.selectedGame
@@ -118,7 +118,7 @@ const update = (state = initialState, action) => {
       })
     }
 
-    case types.app.APP_RECEIVE_PROPS: {
+    case types.app.APP_RECEIVE_PROPS(): {
       return Object.assign({}, state, {
         ...action.props
       })

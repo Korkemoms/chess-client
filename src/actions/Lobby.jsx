@@ -7,41 +7,41 @@ import { types } from '../constants/ActionTypes'
 
 export const receivePlayers = players => {
   return {
-    type: types.lobby.RECEIVE_PLAYERS,
+    type: types.lobby.RECEIVE_PLAYERS(),
     players: players.slice()
   }
 }
 
 export const receiveChessGames = chessGames => {
   return {
-    type: types.lobby.RECEIVE_CHESS_GAMES,
+    type: types.lobby.RECEIVE_CHESS_GAMES(),
     chessGames: chessGames.slice()
   }
 }
 export const receiveChessMoves = chessMoves => {
   return {
-    type: types.lobby.RECEIVE_CHESS_MOVES,
+    type: types.lobby.RECEIVE_CHESS_MOVES(),
     chessMoves: chessMoves.slice()
   }
 }
 
 export const receiveUpdates = players => {
   return {
-    type: types.lobby.RECEIVE_UPDATES,
+    type: types.lobby.RECEIVE_UPDATES(),
     players: players.slice()
   }
 }
 
 export const selectPlayer = player => {
   return {
-    type: types.lobby.SELECT_PLAYER,
+    type: types.lobby.SELECT_PLAYER(),
     selectedPlayer: player
   }
 }
 
 export const _selectGame = (game, moves) => {
   return {
-    type: types.lobby.SELECT_GAME,
+    type: types.lobby.SELECT_GAME(),
     selectedGame: game,
     moves: moves
   }
@@ -49,42 +49,42 @@ export const _selectGame = (game, moves) => {
 
 export const expandGame = (game) => {
   return {
-    type: types.lobby.EXPAND_GAME,
+    type: types.lobby.EXPAND_GAME(),
     expandedGame: game
   }
 }
 
 export const _challengePlayer = player => {
   return {
-    type: types.lobby.CHALLENGE_PLAYER,
+    type: types.lobby.CHALLENGE_PLAYER(),
     challengedPlayer: player
   }
 }
 
 export const challengePlayerFailed = player => {
   return {
-    type: types.lobby.CHALLENGE_PLAYER_FAILED,
+    type: types.lobby.CHALLENGE_PLAYER_FAILED(),
     challengedPlayer: player
   }
 }
 
 export const requestUpdatesFailed = (message, displayMessage) => {
   return {
-    type: types.lobby.REQUEST_UPDATES_FAILED,
+    type: types.lobby.REQUEST_UPDATES_FAILED(),
     message: message
   }
 }
 
 export const requestUpdates = updateIndex => {
   return {
-    type: types.lobby.REQUEST_UPDATES,
+    type: types.lobby.REQUEST_UPDATES(),
     updateIndex: updateIndex
   }
 }
 
 export const selectTab = tab => {
   return {
-    type: types.lobby.SELECT_TAB,
+    type: types.lobby.SELECT_TAB(),
     tab: tab
   }
 }
