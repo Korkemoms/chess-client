@@ -18,6 +18,7 @@ export const receiveChessGames = chessGames => {
     chessGames: chessGames.slice()
   }
 }
+
 export const receiveChessMoves = chessMoves => {
   return {
     type: types.lobby.RECEIVE_CHESS_MOVES(),
