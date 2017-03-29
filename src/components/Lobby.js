@@ -221,9 +221,9 @@ class Lobby extends React.Component {
     let expandedGameInfo = expandedGame
     ? <div>
       <label>Game id:</label> {expandedGame.id}<br />
-      <label>White</label> {`${expandedGame.whitePlayerName}
+      <label>White:</label> {`${expandedGame.whitePlayerName}
         (${expandedGame.whitePlayerUid})`}<br />
-      <label>Black</label> {`${expandedGame.blackPlayerName}
+      <label>Black:</label> {`${expandedGame.blackPlayerName}
         (${expandedGame.blackPlayerUid})`}<br />
     </div>
       : null
