@@ -56,7 +56,7 @@ const update = (state: State = initialState, action: Action) => {
       return Object.assign({}, state, {
         actualIndex: action.payload
       })
-    case ActionTypes.SET_DISPLAY_CONFIRMATIO:
+    case ActionTypes.SET_DISPLAY_CONFIRMATION:
       return Object.assign({}, state, {
         displayConfirmation: action.payload
       })
@@ -106,7 +106,7 @@ const update = (state: State = initialState, action: Action) => {
     case ActionTypes.SELECT_GAME: {
       // determine some values
 
-      let selectedGame = action.payload
+      let selectedGame = action.payload.selectedGame
       let spectator = selectedGame.whitePlayerUid !== state.playerUid &&
         selectedGame.blackPlayerUid !== state.playerUid
 
@@ -117,7 +117,7 @@ const update = (state: State = initialState, action: Action) => {
         visualIndex: 0,
         actualIndex: 0,
         chessStateHistory: [new ChessRules()],
-        gameId: action.payload.id,
+        gameId: selectedGame.id,
         whitePlayerName: selectedGame.whitePlayerName,
         whitePlayerUid: selectedGame.whitePlayerUid,
         blackPlayerName: selectedGame.blackPlayerName,
