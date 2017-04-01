@@ -1,61 +1,76 @@
+// @flow
 import ChessRules from '../components/ChessRules'
-import { types } from '../constants/ActionTypes'
+import type { Action, Move } from './Types'
+import { ActionTypes } from './Types'
 
-export const setFocus = (focusRow, focusCol) => {
+/** Normal action */
+export const setFocus = (focusRow, focusCol): Action => {
   return {
-    type: types.chessGame.SET_FOCUS(),
-    focusRow: focusRow,
-    focusCol: focusCol
-  }
-}
-
-export const setVisualIndex = index => {
-  return {
-    type: types.chessGame.SET_VISUAL_INDEX(),
-    visualIndex: index
+    type: ActionTypes.SET_FOCUS,
+    payload: {
+      focusRow: focusRow,
+      focusCol: focusCol
+    }
   }
 }
 
-export const _sendMove = move => {
+/** Normal action */
+export const _sendMove = (move: Move): Action => {
   return {
-    type: types.chessGame.SEND_MOVE(),
-    move: move
+    type: ActionTypes.SEND_MOVE,
+    payload: move
   }
 }
 
-export const setActualIndex = index => {
+/** Normal action */
+export const setVisualIndex = (index: number): Action => {
   return {
-    type: types.chessGame.SET_ACTUAL_INDEX(),
-    actualIndex: index
+    type: ActionTypes.SET_VISUAL_INDEX,
+    payload: index
   }
 }
 
-export const setDisplayConfirmation = displayConfirmation => {
+/** Normal action */
+export const setActualIndex = (index: number): Action => {
   return {
-    type: types.chessGame.SET_DISPLAY_CONFIRMATION(),
-    displayConfirmation: displayConfirmation
+    type: ActionTypes.SET_ACTUAL_INDEX,
+    payload: index
   }
 }
 
-export const setChessStateHistory = chessStateHistory => {
+/** Normal action */
+export const setDisplayConfirmation = (displayConfirmation: boolean): Action => {
   return {
-    type: types.chessGame.SET_CHESS_STATE_HISTORY(),
-    chessStateHistory: chessStateHistory
+    type: ActionTypes.SET_DISPLAY_CONFIRMATION,
+    payload: displayConfirmation
   }
 }
-export const sendMovesFailed = message => {
+
+/** Normal action */
+export const setChessStateHistory = (chessStateHistory: Array<Object>): Action => {
   return {
-    type: types.chessGame.SEND_MOVES_FAILED(),
-    message: message
+    type: ActionTypes.SET_CHESS_STATE_HISTORY,
+    payload: chessStateHistory
   }
 }
-export const clearChessGame = () => {
+
+/** Normal action */
+export const sendMovesFailed = (message: string): Action => {
   return {
-    type: types.chessGame.CLEAR_CHESS_GAME()
+    type: ActionTypes.SEND_MOVES_FAILED,
+    payload: message
+  }
+}
+
+/** Normal action */
+export const clearChessGame = (): Action => {
+  return {
+    type: ActionTypes.CLEAR_CHESS_GAME
   }
 }
 
 /**
+ * Thunk action
  * Actually move a piece if confirmed.
  * This means moving the piece like normal but also updating the
  * 'actual index' and sending the move to the server.
@@ -66,7 +81,7 @@ export const clearChessGame = () => {
  *
  * @param {boolean} confirmed Whether the move is confirmed
  */
-export const actuallyMove = confirmed => (dispatch, getState) => {
+export const actuallyMove = (confirmed: boolean) => (dispatch: Function, getState: Function) => {
   let state = getState().chessGame
   if (confirmed) {
     const chessState = state.chessStateHistory[state.actualIndex + 1]
@@ -93,6 +108,7 @@ export const actuallyMove = confirmed => (dispatch, getState) => {
 }
 
 /**
+ * Thunk action
  * Determines what to do when a square on the board is clicked,
  * then appropriate actions are dispatched.
  *
@@ -143,19 +159,59 @@ export const handleClick = (row, col) => (dispatch, getState) => {
     let lastMoveNumber = chessState.moves.length > 0
     ? chessState.moves[chessState.moves.length - 1].number : 0
 
-    dispatch(move(focusRow, focusCol, row, col, lastMoveNumber + 1,
-      false, state.actualIndex, state.visualIndex, state.chessStateHistory))
+    dispatch(move(focusRow, focusCol, row, col, lastMoveNumber + 1, false))
   }
 }
 
 /**
+ * Thunk action
+ * Apply 1 move. Nothing is done directly by this method
+ * instead appropriate 'real' actions are dispatched.
+ * @param {boolean} actual Whether to also update the 'actual index'
+ * @param {number} number The move number, it is used to prevent 'duplicate' moves.
+ * @returns the chess state after the moves
+ */
+export const move = (fromRow, fromCol, toRow, toCol, number, actual) => (dispatch, getState) => {
+  let state = getState().chessGame
+
+  const index = actual ? state.actualIndex : state.visualIndex
+  const chessState = state.chessStateHistory[index]
+
+  // verify move number
+  number = Number(number)
+  let lastMoveNumber = chessState.moves.length > 0
+  ? chessState.moves[chessState.moves.length - 1].number : 0
+  if (number !== lastMoveNumber + 1) {
+    console.log('Duplicate move (' + number + '), ignoring')
+    return null
+  }
+
+  // add a new chess rule state to history
+  const newRuleState = chessState.move(fromRow, fromCol, toRow, toCol)
+  const newHistory = state.chessStateHistory.slice(0, index + 1)
+  newHistory.push(newRuleState)
+
+  // update redux store
+  dispatch(setChessStateHistory(newHistory))
+  dispatch(setVisualIndex(index + 1))
+  if (actual) {
+    dispatch(setActualIndex(state.actualIndex + 1))
+  }
+
+  dispatch(setFocus(-1, -1))
+
+  return newRuleState
+}
+
+/**
+ * Thunk action
  * Init the game with 0 or more moves. Nothing is done directly by this method
  * instead appropriate 'real' actions are dispatched.
  * @param {Array} moves The moves to be performed
  * @param {boolean} actual Whether to also update the 'actual index'
  * @returns the chess state after the moves
  */
-export const initWithMoves = (moves, actual) => dispatch => {
+export const initWithMoves = (moves: Array<Move>, actual) => dispatch => {
   if (moves.length === 0) return
 
   let index = 0
@@ -194,13 +250,14 @@ export const initWithMoves = (moves, actual) => dispatch => {
 }
 
 /**
+ * Thunk action
  * Apply 0 or more moves. Nothing is done directly by this method
  * instead appropriate 'real' actions are dispatched.
  * @param {Array} moves The moves to be performed
  * @param {boolean} actual Whether to also update the 'actual index'
  * @returns the chess state after the moves
  */
-export const moveMany = (moves, actual) => (dispatch, getState) => {
+export const moveMany = (moves: Array<Move>, actual: bool) => (dispatch, getState) => {
   if (moves.length === 0) return
 
   let state = getState().chessGame
@@ -242,66 +299,12 @@ export const moveMany = (moves, actual) => (dispatch, getState) => {
 }
 
 /**
- * Apply 1 move. Nothing is done directly by this method
- * instead appropriate 'real' actions are dispatched.
- * @param {boolean} actual Whether to also update the 'actual index'
- * @param {number} number The move number, it is used to prevent 'duplicate' moves.
- * @returns the chess state after the moves
- */
-export const move = (fromRow, fromCol, toRow, toCol, number,
-  actual) => (dispatch, getState) => {
-    let state = getState().chessGame
-
-    const index = actual ? state.actualIndex : state.visualIndex
-    const chessState = state.chessStateHistory[index]
-
-    // verify move number
-    number = Number(number)
-    let lastMoveNumber = chessState.moves.length > 0
-    ? chessState.moves[chessState.moves.length - 1].number : 0
-    if (number !== lastMoveNumber + 1) {
-      console.log('Duplicate move (' + number + '), ignoring')
-      return null
-    }
-
-    // add a new chess rule state to history
-    const newRuleState = chessState.move(fromRow, fromCol, toRow, toCol)
-    const newHistory = state.chessStateHistory.slice(0, index + 1)
-    newHistory.push(newRuleState)
-
-    // update redux store
-    dispatch(setChessStateHistory(newHistory))
-    dispatch(setVisualIndex(index + 1))
-    if (actual) {
-      dispatch(setActualIndex(state.actualIndex + 1))
-    }
-
-    dispatch(setFocus(-1, -1))
-
-    return newRuleState
-  }
-
-/**
- * @typedef {Object} Move
- * @property {number} fromRow
- * @property {number} fromCol
- * @property {number} toRow
- * @property {number} toCol
- * @property {number} number The move number
- * @property {number} chessGameId
- */
-
-/**
-* @callback callback
-* @param {object} response The response body from the API
-*/
-
-/**
+ * Thunk action
  * Send a move to the server.
- *  @param {Move} move the move to send
- *  @param {callback} callback the response from the API
+ * @param {Move} move the move to send
+ * @param {callback} callback the response from the API
  */
-export const sendMove = (move, callback) => (dispatch, getState) => {
+export const sendMove = (move: Move, callback) => (dispatch, getState) => {
   dispatch(_sendMove(move))
 
   let body = {

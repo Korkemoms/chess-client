@@ -1,0 +1,18 @@
+[ignore]
+.*/node_modules/animated/.*
+.*/chess-client/.*
+.*/react-native-web/.*
+.*/scss/.*
+
+
+[include]
+
+[libs]
+
+[options]
+module.name_mapper.extension='css' -> '<PROJECT_ROOT>/flow/CSSModule.js.flow'
+module.file_ext=.js
+module.file_ext=.json
+module.file_ext=.jsx
+module.file_ext=.css
+module.file_ext=.scss

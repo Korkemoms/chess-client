@@ -1,3 +1,4 @@
+// @flow
 // const index->rowLabels = '01234567'->'87654321';
 // const index->colLabels = '01234567'->'abcdefgh';
 

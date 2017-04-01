@@ -1,5 +1,7 @@
+// @flow
 import ChessGame from '../components/ChessGame'
 import { connect } from 'react-redux'
+import type { State } from '../reducers/ChessGame'
 import {
   setFocus,
   setVisualIndex,
@@ -13,7 +15,7 @@ import {
   receiveChessMoves
 } from '../actions/ChessGame'
 
-const ChessGameContainer = ((Target, namespace) => {
+const ChessGameContainer = ((Target: Object, namespace: string) => {
   const mapDispatchToProps = {
     setFocus,
     setVisualIndex,
@@ -27,8 +29,8 @@ const ChessGameContainer = ((Target, namespace) => {
     receiveChessMoves
   }
 
-  const mapStateToProps = (state) => {
-    const localState = namespace ? state[namespace] : state
+  const mapStateToProps = (state): State => {
+    const localState: State = namespace ? state[namespace] : state
     return Object.assign({}, localState)
   }
 

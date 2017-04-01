@@ -1,77 +1,86 @@
+// @flow
+import type { Action } from '../actions/Types'
+import { ActionTypes } from '../actions/Types'
 import ChessRules from '../components/ChessRules'
-import { PropTypes } from 'react'
-import ChessGame from '../components/ChessGame'
-import { types } from '../constants/ActionTypes'
 
-/** Define initial Redux state and React PropTypes */
-const def = (props = false) => {
-  const f = props ? (_, type) => type : (val, _) => val
-  let r = { // initial Redux state and React PropTypes
-    focusRow: f(-1, PropTypes.number.isRequired),
-    focusCol: f(-1, PropTypes.number.isRequired),
-    visualIndex: f(0, PropTypes.number.isRequired),
-    actualIndex: f(0, PropTypes.number.isRequired),
-    gameId: f(null, PropTypes.string),
-    displayConfirmation: f(false, PropTypes.bool),
-    chessStateHistory: f([new ChessRules()], PropTypes.array.isRequired),
-    whitePlayerUid: f(null, PropTypes.string),
-    whitePlayerName: f('Player1', PropTypes.string.isRequired),
-    blackPlayerUid: f(null, PropTypes.string),
-    blackPlayerName: f('Player2', PropTypes.string.isRequired),
-    playerUid: f(null, PropTypes.string),
-    playerName: f(null, PropTypes.string),
-    myColor: f('White', PropTypes.string.isRequired),
-    spectator: f(true, PropTypes.bool),
-    myFetch: f(null, PropTypes.func)
-  }
-  if (props) { // add more React PropTypes
-    r = {...r}
-  }
-  return r
+export type State = {
+  focusRow: number,
+  focusCol: number,
+  visualIndex: number,
+  actualIndex: number,
+  gameId: ?number,
+  displayConfirmation: ?bool,
+  chessStateHistory: Array,
+  whitePlayerUid: ?string,
+  whitePlayerName: ?string,
+  blackPlayerUid: ?string,
+  blackPlayerName: ?string,
+  playerUid: ?string,
+  playerName: ?string,
+  myColor: ?string,
+  spectator: bool,
+  myFetch: ?Function
 }
-const initialState = def()
-ChessGame.propTypes = def(true)
 
-const update = (state = initialState, action) => {
+const initialState = {
+  focusRow: -1,
+  focusCol: -1,
+  visualIndex: 0,
+  actualIndex: 0,
+  gameId: null,
+  displayConfirmation: false,
+  chessStateHistory: [new ChessRules()],
+  whitePlayerUid: null,
+  whitePlayerName: 'Player1',
+  blackPlayerUid: null,
+  blackPlayerName: 'Player2',
+  playerUid: null,
+  playerName: null,
+  myColor: 'White',
+  spectator: true,
+  myFetch: null
+}
+
+const update = (state: State = initialState, action: Action) => {
   switch (action.type) {
-    case types.chessGame.SET_FOCUS():
+    case ActionTypes.SET_FOCUS:
       return Object.assign({}, state, {
-        focusRow: action.focusRow,
-        focusCol: action.focusCol
+        focusRow: action.payload.focusRow,
+        focusCol: action.payload.focusCol
       })
-    case types.chessGame.SET_VISUAL_INDEX():
+    case ActionTypes.SET_VISUAL_INDEX:
       return Object.assign({}, state, {
-        visualIndex: action.visualIndex
+        visualIndex: action.payload
       })
-    case types.chessGame.SET_ACTUAL_INDEX():
+    case ActionTypes.SET_ACTUAL_INDEX:
       return Object.assign({}, state, {
-        actualIndex: action.actualIndex
+        actualIndex: action.payload
       })
-    case types.chessGame.SET_DISPLAY_CONFIRMATION():
+    case ActionTypes.SET_DISPLAY_CONFIRMATIO:
       return Object.assign({}, state, {
-        displayConfirmation: action.displayConfirmation
+        displayConfirmation: action.payload
       })
-    case types.chessGame.SET_CHESS_STATE_HISTORY():
+    case ActionTypes.SET_CHESS_STATE_HISTORY:
       return Object.assign({}, state, {
-        chessStateHistory: action.chessStateHistory
+        chessStateHistory: action.payload
       })
-    case types.chessGame.CLEAR_CHESS_GAME(): {
+    case ActionTypes.CLEAR_CHESS_GAME: {
       // reset most of the state
       let playerName = state.playerName
       let playerUid = state.playerUid
       let myFetch = state.myFetch
 
       return {
-        ...def(),
+        ...initialState,
         playerName,
         playerUid,
         myFetch
       }
     }
-    case types.lobby.RECEIVE_CHESS_GAMES(): {
+    case ActionTypes.RECEIVE_CHESS_GAMES: {
       // determine if we receive info about current game (same id)
       let received
-      Object.values(action.chessGames).forEach(game => {
+      Object.values(action.payload).forEach(game => {
         if (game.id === state.gameId) {
           received = game
         }
@@ -94,10 +103,10 @@ const update = (state = initialState, action) => {
         spectator: spectator
       })
     }
-    case types.lobby.SELECT_GAME(): {
+    case ActionTypes.SELECT_GAME: {
       // determine some values
 
-      let selectedGame = action.selectedGame
+      let selectedGame = action.payload
       let spectator = selectedGame.whitePlayerUid !== state.playerUid &&
         selectedGame.blackPlayerUid !== state.playerUid
 
@@ -108,7 +117,7 @@ const update = (state = initialState, action) => {
         visualIndex: 0,
         actualIndex: 0,
         chessStateHistory: [new ChessRules()],
-        gameId: action.selectedGame.id,
+        gameId: action.payload.id,
         whitePlayerName: selectedGame.whitePlayerName,
         whitePlayerUid: selectedGame.whitePlayerUid,
         blackPlayerName: selectedGame.blackPlayerName,
@@ -118,9 +127,10 @@ const update = (state = initialState, action) => {
       })
     }
 
-    case types.app.APP_RECEIVE_PROPS(): {
+    case ActionTypes.APP_RECEIVE_PROPS: {
       return Object.assign({}, state, {
-        ...action.props
+        ...initialState, // reset everything
+        ...action.payload  // except this
       })
     }
     default:

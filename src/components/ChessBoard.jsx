@@ -1,3 +1,4 @@
+// @flow
 import '../Chess.scss'
 import React from 'react'
 

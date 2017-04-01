@@ -1,5 +1,7 @@
+// @flow
 import Lobby from '../components/Lobby'
 import { connect } from 'react-redux'
+import type { State } from '../reducers/Lobby'
 import {
   selectPlayer,
   challengePlayer,
@@ -9,9 +11,9 @@ import {
   selectTab
 } from '../actions/Lobby'
 
-const LobbyContainer = ((Target, namespace) => {
-  const mapStateToProps = (state) => {
-    const localState = namespace ? state[namespace] : state
+const LobbyContainer = ((Target: Object, namespace: string) => {
+  const mapStateToProps = (state): State => {
+    const localState: State = namespace ? state[namespace] : state
     return Object.assign({}, localState)
   }
 

@@ -1,8 +1,10 @@
-import { types } from '../constants/ActionTypes'
+// @flow
+import type { Action } from './Types'
+import { ActionTypes } from './Types'
 
-export const appReceiveProps = (props) => {
+export const appReceiveProps = (props: Object): Action => {
   return {
-    type: types.app.APP_RECEIVE_PROPS(),
-    props: props
+    type: ActionTypes.APP_RECEIVE_PROPS,
+    payload: props
   }
 }

@@ -1,95 +1,113 @@
+// @flow
 import {
   moveMany,
   clearChessGame,
   initWithMoves
 } from './ChessGame'
-import { types } from '../constants/ActionTypes'
 
-export const receivePlayers = players => {
+import type { Action } from './Types'
+import { ActionTypes } from './Types'
+
+/** Normal action */
+export const receivePlayers = (players): Action => {
   return {
-    type: types.lobby.RECEIVE_PLAYERS(),
-    players: players.slice()
+    type: ActionTypes.RECEIVE_PLAYERS,
+    payload: players.slice()
   }
 }
 
-export const receiveChessGames = chessGames => {
+/** Normal action */
+export const receiveChessGames = (chessGames): Action => {
   return {
-    type: types.lobby.RECEIVE_CHESS_GAMES(),
-    chessGames: chessGames.slice()
+    type: ActionTypes.RECEIVE_CHESS_GAMES,
+    payload: chessGames.slice()
   }
 }
 
-export const receiveChessMoves = chessMoves => {
+/** Normal action */
+export const receiveChessMoves = (chessMoves): Action => {
   return {
-    type: types.lobby.RECEIVE_CHESS_MOVES(),
-    chessMoves: chessMoves.slice()
+    type: ActionTypes.RECEIVE_CHESS_MOVES,
+    payload: chessMoves.slice()
   }
 }
 
-export const receiveUpdates = players => {
+/** Normal action */
+export const receiveUpdates = (players): Action => {
   return {
-    type: types.lobby.RECEIVE_UPDATES(),
-    players: players.slice()
+    type: ActionTypes.RECEIVE_UPDATES,
+    payload: players.slice()
   }
 }
 
-export const selectPlayer = player => {
+/** Normal action */
+export const selectPlayer = (player): Action => {
   return {
-    type: types.lobby.SELECT_PLAYER(),
-    selectedPlayer: player
+    type: ActionTypes.SELECT_PLAYER,
+    payload: player
   }
 }
 
-export const _selectGame = (game, moves) => {
+/** Normal action */
+export const _selectGame = (game, moves): Action => {
   return {
-    type: types.lobby.SELECT_GAME(),
-    selectedGame: game,
-    moves: moves
+    type: ActionTypes.SELECT_GAME,
+    payload: {
+      selectedGame: game,
+      moves: moves
+    }
   }
 }
 
-export const expandGame = (game) => {
+/** Normal action */
+export const expandGame = (game): Action => {
   return {
-    type: types.lobby.EXPAND_GAME(),
-    expandedGame: game
+    type: ActionTypes.EXPAND_GAME,
+    payload: game
   }
 }
 
-export const _challengePlayer = player => {
+/** Normal action */
+export const _challengePlayer = (player): Action => {
   return {
-    type: types.lobby.CHALLENGE_PLAYER(),
-    challengedPlayer: player
+    type: ActionTypes.CHALLENGE_PLAYER,
+    payload: player
   }
 }
 
-export const challengePlayerFailed = player => {
+/** Normal action */
+export const challengePlayerFailed = (player): Action => {
   return {
-    type: types.lobby.CHALLENGE_PLAYER_FAILED(),
-    challengedPlayer: player
+    type: ActionTypes.CHALLENGE_PLAYER_FAILED,
+    payload: player
   }
 }
 
-export const requestUpdatesFailed = (message, displayMessage) => {
+/** Normal action */
+export const requestUpdatesFailed = (message, displayMessage): Action => {
   return {
-    type: types.lobby.REQUEST_UPDATES_FAILED(),
-    message: message
+    type: ActionTypes.REQUEST_UPDATES_FAILED,
+    payload: message
   }
 }
 
-export const requestUpdates = updateIndex => {
+/** Normal action */
+export const requestUpdates = (updateIndex): Action => {
   return {
-    type: types.lobby.REQUEST_UPDATES(),
-    updateIndex: updateIndex
+    type: ActionTypes.REQUEST_UPDATES,
+    payload: updateIndex
   }
 }
 
-export const selectTab = tab => {
+/** Normal action */
+export const selectTab = (tab): Action => {
   return {
-    type: types.lobby.SELECT_TAB(),
-    tab: tab
+    type: ActionTypes.SELECT_TAB,
+    payload: tab
   }
 }
 
+/** Thunk action */
 export const selectGame = (game, moves) => dispatch => {
   dispatch(clearChessGame())
   dispatch(_selectGame(game, moves))
@@ -97,12 +115,13 @@ export const selectGame = (game, moves) => dispatch => {
 }
 
 /**
+ * Thunk action
  * Send a challenge to the server.
  * @param {myFetch} myFetch custom fetch
  * @param {player} player Player to challenge
  * @param {player} me The challenger
  */
-export const challengePlayer = (myFetch, me, player) => dispatch => {
+export const challengePlayer = (myFetch, me, player) => (dispatch, getState) => {
   console.log(me, player)
   dispatch(_challengePlayer(player))
 
@@ -117,12 +136,17 @@ export const challengePlayer = (myFetch, me, player) => dispatch => {
     method: 'POST',
     body: JSON.stringify(body)
   })
+  .then(() => {
+    let state = getState()
+    dispatch(fetchUpdates(myFetch, state.updateIndex))
+  })
   .catch(error => { // handle errors
     dispatch(challengePlayerFailed('Something went wrong: ' + error))
   })
 }
 
 /**
+ * Thunk action
  * Request updates from server, will only send you resources
  * whose updateIndex is larger than the given one.
  * @param {myFetch} myFetch custom fetch
